@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex Morgan | Full Stack Developer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config & Custom Styles -->
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                },
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 1s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(2.5rem)' }, 
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar Hide */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Fade In Observer Styles */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(3rem); 
+            transition: all 1000ms ease-out;
+        }
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Smooth Max Height Transition for Project Details */
+        .details-container {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+            overflow: hidden;
+            transition: all 700ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .details-container.open {
+            max-height: 1000px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+        
+        /* Mobile Menu Transition helper */
+        #mobile-menu {
+            transition-property: transform, opacity, visibility;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 500ms;
+        }
+
+        /* Custom Mask for Desktop Hero Image blending */
+        .hero-image-mask {
+            mask-image: linear-gradient(to right, transparent 0%, black 20%, black 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-violet-500 selection:text-white overflow-x-hidden">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-slate-950/50 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between relative z-50">
+            <div class="text-xl font-bold tracking-tight text-white drop-shadow-md">
+                ALEX<span class="text-violet-500">.DESIGN</span>
+            </div>
+
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300" id="desktop-nav">
+                <!-- Links injected by JS -->
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="menu-toggle" class="md:hidden text-white p-2 cursor-pointer hover:bg-white/5 rounded-full transition-colors relative z-50" aria-label="Toggle menu">
+                <i data-lucide="menu" id="menu-icon"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="absolute top-0 left-0 w-full h-auto bg-slate-950/90 backdrop-blur-md border-b border-white/10 shadow-2xl flex flex-col pt-20 pb-8 px-6 gap-2 md:hidden z-40 transform -translate-y-full opacity-0 invisible">
+            <!-- Mobile links injected by JS -->
+        </div>
+    </nav>
+
+    <!-- HERO SECTION CONTAINER -->
+    <div id="hero" class="relative min-h-screen w-full bg-slate-950 overflow-hidden">
+        
+        <!-- ========================================== -->
+        <!-- MOBILE HERO LAYOUT (Original - Keeping as requested) -->
+        <!-- ========================================== -->
+        <div class="md:hidden relative h-screen w-full flex items-end justify-start pt-28">
+            <div class="absolute inset-0 z-0">
+                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=2574&auto=format&fit=crop" alt="Portrait" class="w-full h-full object-cover object-top">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent"></div>
+            </div>
+
+            <div class="relative z-10 w-full px-6 pb-24">
+                <div class="animate-fade-in-up">
+                    <div class="flex flex-col items-start">
+                        <h1 class="text-5xl font-bold tracking-tighter text-white leading-[0.9] mb-6">
+                            ALEX <br> MORGAN
+                        </h1>
+                        <div class="text-xl text-violet-400 font-medium tracking-wide mb-10">
+                            Full Stack Developer
+                        </div>
+                        <a href="#projects" onclick="scrollToSection(event, 'projects')" class="inline-flex items-center gap-4 px-8 py-4 bg-white text-slate-950 rounded-full font-bold text-lg hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_30px_-5px_rgba(255,255,255,0.3)] whitespace-nowrap">
+                            View Selected Work
+                            <i data-lucide="arrow-right" class="w-5 h-5 shrink-0"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- DESKTOP HERO LAYOUT (New Popular Split Design) -->
+        <!-- ========================================== -->
+        <div class="hidden md:flex h-screen w-full items-center justify-center relative">
+            
+            <!-- 1. Background Ambient Glow (Gradient overlay behind text) -->
+            <div class="absolute top-1/2 left-0 -translate-y-1/2 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+            <!-- 2. Right Side Image with Blending -->
+            <div class="absolute right-0 top-0 bottom-0 w-[55%] z-0">
+                <!-- Image Wrapper with Masking for smooth blend to left -->
+                <div class="w-full h-full hero-image-mask relative">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=2574&auto=format&fit=crop" alt="Portrait" class="w-full h-full object-cover object-top opacity-90">
+                    <!-- Additional overlay for color tint consistency -->
+                    <div class="absolute inset-0 bg-slate-950/20 mix-blend-multiply"></div>
+                </div>
+                <!-- Hard gradient overlay on the very left edge of image to ensure seamless text readability -->
+                <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-slate-950 to-transparent"></div>
+            </div>
+
+            <!-- 3. Left Side Content -->
+            <div class="relative z-10 max-w-7xl mx-auto w-full px-6 grid grid-cols-12 h-full items-center">
+                <div class="col-span-7 flex flex-col justify-center items-start pt-16">
+                    
+                    <!-- Badge -->
+                    <div class="animate-fade-in-up opacity-0" style="animation-delay: 100ms;">
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8 hover:bg-white/10 transition-colors cursor-default">
+                            <span class="relative flex h-2 w-2">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                            <span class="text-xs font-semibold text-slate-300 uppercase tracking-widest">Available for Freelance</span>
+                        </div>
+                    </div>
+
+                    <!-- Name & Role -->
+                    <div class="animate-fade-in-up opacity-0" style="animation-delay: 200ms;">
+                        <h1 class="text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tighter text-white leading-[0.9] mb-4">
+                            ALEX <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-500">MORGAN</span>
+                        </h1>
+                        <p class="text-2xl text-violet-400 font-medium tracking-wide mb-8 flex items-center gap-3">
+                            <span class="h-[2px] w-8 bg-violet-500 inline-block"></span>
+                            Full Stack Developer
+                        </p>
+                    </div>
+
+                    <!-- Description (Optional Addition) -->
+                    <div class="animate-fade-in-up opacity-0 max-w-lg" style="animation-delay: 300ms;">
+                        <p class="text-slate-400 text-lg leading-relaxed mb-10">
+                            I craft high-performance digital experiences that merge art with engineering. Specialized in building scalable SaaS platforms and interactive web applications.
+                        </p>
+                    </div>
+
+                    <!-- CTA & Socials -->
+                    <div class="animate-fade-in-up opacity-0 flex items-center gap-8" style="animation-delay: 400ms;">
+                        <a href="#projects" onclick="scrollToSection(event, 'projects')" class="group relative px-8 py-4 bg-white text-slate-950 rounded-full font-bold text-lg overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)]">
+                            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-violet-200 via-white to-violet-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <span class="relative flex items-center gap-2">
+                                View Selected Work <i data-lucide="arrow-right" class="w-5 h-5 transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </a>
+
+                        <!-- Mini Stats (Popular layout addition) -->
+                        <div class="hidden xl:flex gap-8 border-l border-white/10 pl-8">
+                            <div>
+                                <span class="block text-2xl font-bold text-white">5+</span>
+                                <span class="text-xs text-slate-500 uppercase tracking-wider">Years Exp</span>
+                            </div>
+                            <div>
+                                <span class="block text-2xl font-bold text-white">40+</span>
+                                <span class="text-xs text-slate-500 uppercase tracking-wider">Projects</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SERVICES SECTION -->
+    <section id="services" class="py-16 px-6 bg-slate-950 border-b border-white/5">
+        <div class="max-w-7xl mx-auto">
+            <div class="reveal-on-scroll mb-8 border-l-2 border-violet-500 pl-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-1">Expertise</h2>
+                    <p class="text-slate-400 text-sm md:text-base">Strategic design solutions.</p>
+                </div>
+                <div class="hidden md:block h-[1px] flex-1 bg-white/10 ml-8 max-w-xs"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-5" id="services-list">
+                <!-- Services injected by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECTS SECTION -->
+    <section id="projects" class="pt-10 pb-10 bg-slate-900 overflow-hidden flex flex-col transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-6 mb-0 flex items-end justify-between w-full">
+            <div class="reveal-on-scroll">
+                <h2 class="text-4xl font-bold text-white mb-4">Selected Work</h2>
+                <p class="text-slate-400">Tap a project to view details.</p>
+            </div>
+            
+            <div class="hidden md:flex gap-2 text-slate-500 items-center">
+                <span class="text-sm uppercase tracking-widest">Scroll</span>
+                <i data-lucide="move-right"></i>
+            </div>
+        </div>
+
+        <!-- Horizontal Scroll Container -->
+        <div class="reveal-on-scroll" style="transition-delay: 200ms;">
+            <div id="projects-carousel" class="flex overflow-x-auto snap-x snap-mandatory gap-6 px-6 pt-4 pb-8 w-full no-scrollbar scroll-smooth">
+                <!-- Projects injected by JS -->
+            </div>
+        </div>
+
+        <!-- Scroll Indicators (Dots) -->
+        <div class="reveal-on-scroll" style="transition-delay: 400ms;">
+            <div id="project-dots" class="flex justify-center gap-3 mt-2 mb-4">
+                <!-- Dots injected by JS -->
+            </div>
+        </div>
+
+        <!-- Project Details Section (Expandable) -->
+        <div id="project-details-container" class="details-container w-full px-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="bg-slate-950/50 border border-white/10 rounded-3xl p-8 md:p-12 backdrop-blur-sm relative overflow-hidden transform transition-transform duration-500">
+                    <!-- Background Icon -->
+                    <div class="absolute top-0 right-0 p-4 opacity-10 text-white">
+                        <i data-lucide="code-2" width="120" height="120"></i>
+                    </div>
+                    
+                    <div class="relative z-10 grid md:grid-cols-2 gap-12">
+                        <div>
+                            <div class="flex items-center gap-3 mb-6">
+                                <span class="h-px w-8 bg-violet-500"></span>
+                                <span class="text-violet-400 font-bold uppercase tracking-widest text-sm">Project Details</span>
+                            </div>
+                            <h3 id="detail-title" class="text-3xl md:text-4xl font-bold text-white mb-6"></h3>
+                            <p id="detail-desc" class="text-slate-300 text-lg leading-relaxed mb-8"></p>
+                            <a href="#" class="inline-flex items-center gap-2 text-white font-semibold hover:text-violet-400 transition-colors">
+                                View Case Study <i data-lucide="external-link" size="18"></i>
+                            </a>
+                        </div>
+
+                        <div class="space-y-8 md:border-l md:border-white/10 md:pl-12">
+                            <div>
+                                <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Tech Stack</h4>
+                                <div id="detail-stack" class="flex flex-wrap gap-3"></div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Key Result</h4>
+                                <div class="flex items-start gap-3">
+                                    <i data-lucide="check-circle-2" class="text-green-500 mt-1 shrink-0"></i>
+                                    <span id="detail-result" class="text-xl text-white font-medium"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="py-32 px-6 bg-slate-950 relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-violet-600/20 rounded-full blur-[120px]"></div>
+
+        <div id="contact-container" class="relative z-10 max-w-7xl mx-auto px-6">
+            <!-- Injected via JS -->
+        </div>
+
+        <footer id="footer-container" class="absolute bottom-6 left-0 right-0 text-center text-slate-600 text-sm">
+            <!-- Injected via JS -->
+        </footer>
+    </section>
+
+    <!-- MAIN JAVASCRIPT -->
+    <script>
+        // --- DATA SOURCE ---
+        const portfolioData = {
+            nav: {
+                links: [
+                    { name: "Services", href: "services" }, 
+                    { name: "Work", href: "projects" }
+                ],
+                cta: "Get in Touch",
+                ctaLink: "contact"
+            },
+            services: {
+                list: [
+                    {
+                        id: 1,
+                        icon: "monitor",
+                        title: "Digital Interface Design",
+                        desc: "High-fidelity UI for web and mobile applications, focusing on conversion."
+                    },
+                    {
+                        id: 2,
+                        icon: "layers",
+                        title: "Design Systems",
+                        desc: "Scalable component libraries ensuring consistency across products."
+                    },
+                    {
+                        id: 3,
+                        icon: "pen-tool",
+                        title: "Interaction Design",
+                        desc: "Micro-interactions and motion design adding depth to user experience."
+                    }
+                ]
+            },
+            projects: {
+                list: [
+                    {
+                        id: 1,
+                        title: "FinTech Dashboard",
+                        category: "SaaS Platform",
+                        img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop",
+                        description: "A comprehensive financial analytics platform tailored for enterprise clients. The redesign focused on data visualization clarity and reducing the time-to-insight for portfolio managers.",
+                        stack: ["React", "TypeScript", "D3.js"],
+                        result: "40% increase in user retention"
+                    },
+                    {
+                        id: 2,
+                        title: "NeoBank Mobile App",
+                        category: "iOS / Android",
+                        img: "https://images.unsplash.com/photo-1616469829581-73993eb86b02?q=80&w=2670&auto=format&fit=crop",
+                        description: "A challenger bank app built for Gen Z. We created a gamified savings experience with a dark-mode-first UI that simplifies complex banking operations into swipeable actions.",
+                        stack: ["Flutter", "Firebase", "Node.js"],
+                        result: "1M+ downloads in first month"
+                    },
+                    {
+                        id: 3,
+                        title: "Luxe E-Commerce",
+                        category: "Web Design",
+                        img: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2670&auto=format&fit=crop",
+                        description: "An immersive shopping experience for a high-end fashion brand. The site features smooth page transitions, 3D product previews, and a bespoke checkout flow.",
+                        stack: ["Next.js", "WebGL", "Shopify"],
+                        result: "2x conversion rate vs old site"
+                    },
+                    {
+                        id: 4,
+                        title: "Health Tracker",
+                        category: "Product Design",
+                        img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=2670&auto=format&fit=crop",
+                        description: "IoT companion app for a smart wearable device. We focused on accessibility and creating a calming color system to present health data without inducing anxiety.",
+                        stack: ["SwiftUI", "Bluetooth LE", "AWS"],
+                        result: "Featured in App Store Health"
+                    }
+                ]
+            },
+            contact: {
+                title: "Let's build something \nremarkable.", 
+                subtitle: "Currently available for select freelance opportunities.",
+                email: "hello@alex.design",
+                socials: [
+                    { name: "WhatsApp", url: "https://wa.me/6281234567890", icon: "message-circle" },
+                    { name: "Instagram", url: "https://instagram.com/alex.design.dummy", icon: "instagram" }
+                ],
+                copyright: `© ${new Date().getFullYear()} Alex Morgan. All Rights Reserved.`
+            }
+        };
+
+        // --- RENDER CONTENT ---
+        
+        // 1. Render Nav Links
+        const desktopNav = document.getElementById('desktop-nav');
+        const mobileNav = document.getElementById('mobile-menu');
+
+        portfolioData.nav.links.forEach(link => {
+            // Desktop
+            desktopNav.innerHTML += `
+                <a href="#${link.href}" onclick="scrollToSection(event, '${link.href}')" class="nav-link transition-colors drop-shadow-sm hover:text-white" data-target="${link.href}">
+                    ${link.name}
+                </a>
+            `;
+            // Mobile
+            mobileNav.innerHTML += `
+                <a href="#${link.href}" onclick="scrollToSection(event, '${link.href}')" class="mobile-link text-base block w-full py-2 cursor-pointer transition-all rounded-lg px-2 text-slate-300 hover:text-white hover:bg-white/5" data-target="${link.href}">
+                    ${link.name}
+                </a>
+            `;
+        });
+
+        // Add CTA to Nav
+        desktopNav.innerHTML += `
+            <button onclick="scrollToSection(event, '${portfolioData.nav.ctaLink}')" class="cta-btn px-5 py-2.5 backdrop-blur-md border border-white/20 rounded-full transition-colors font-semibold bg-white/10 text-white hover:bg-white hover:text-slate-950" data-target="${portfolioData.nav.ctaLink}">
+                ${portfolioData.nav.cta}
+            </button>
+        `;
+        mobileNav.innerHTML += `
+            <a href="#${portfolioData.nav.ctaLink}" onclick="scrollToSection(event, '${portfolioData.nav.ctaLink}')" class="mobile-cta text-base block w-full py-2 cursor-pointer transition-all rounded-lg px-2 text-slate-300 font-medium hover:text-white hover:bg-white/5" data-target="${portfolioData.nav.ctaLink}">
+                ${portfolioData.nav.cta}
+            </a>
+        `;
+
+        // 2. Render Services
+        const servicesList = document.getElementById('services-list');
+        portfolioData.services.list.forEach((service, idx) => {
+            const delay = idx * 150;
+            servicesList.innerHTML += `
+                <div class="reveal-on-scroll h-full" style="transition-delay: ${delay}ms">
+                    <div class="p-5 h-full rounded-xl bg-slate-900 border border-white/5 hover:border-violet-500/30 transition-all hover:bg-slate-900/80 group">
+                        <div class="flex items-center gap-4 mb-3">
+                            <div class="p-2 bg-slate-950 rounded-lg shrink-0 group-hover:scale-110 transition-transform">
+                                <i data-lucide="${service.icon}" class="w-5 h-5 text-violet-400"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-white leading-tight">${service.title}</h3>
+                        </div>
+                        <p class="text-slate-400 text-sm leading-relaxed">${service.desc}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        // 3. Render Projects
+        const projectsCarousel = document.getElementById('projects-carousel');
+        const projectDots = document.getElementById('project-dots');
+
+        portfolioData.projects.list.forEach((project, idx) => {
+            // Card
+            projectsCarousel.innerHTML += `
+                <div 
+                    class="project-card snap-center shrink-0 w-[85vw] md:w-[600px] aspect-[16/10] relative rounded-3xl overflow-hidden group cursor-pointer border border-white/10 transition-all duration-300 hover:border-white/30 hover:scale-[1.01]"
+                    data-id="${project.id}"
+                    onclick="handleProjectClick(${project.id})"
+                >
+                    <img src="${project.img}" alt="${project.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent opacity-90"></div>
+                    
+                    <div class="absolute bottom-0 left-0 p-8 md:p-10 w-full">
+                        <span class="text-violet-400 text-sm font-bold uppercase tracking-wider mb-2 block">
+                            ${project.category}
+                        </span>
+                        <div class="flex justify-between items-end">
+                            <h3 class="text-3xl font-bold text-white">${project.title}</h3>
+                            <div class="arrow-indicator w-12 h-12 rounded-full bg-white text-slate-950 flex items-center justify-center transition-all duration-300 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0">
+                                <i data-lucide="arrow-right" size="20"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Spacer for last item padding -->
+                ${idx === portfolioData.projects.list.length - 1 ? '<div class="shrink-0 w-6"></div>' : ''}
+            `;
+
+            // Dot - FIXED: w-2 and h-2 are hardcoded to avoid removal
+            projectDots.innerHTML += `
+                <button 
+                    onclick="scrollToProject(${idx})"
+                    class="project-dot h-2 w-2 rounded-full transition-all duration-300 cursor-pointer bg-slate-700 hover:bg-slate-600"
+                    aria-label="View project ${project.title}"
+                    data-index="${idx}"
+                ></button>
+            `;
+        });
+
+        // 4. Render Contact & Footer (Responsive: Mobile Old Style, Desktop New Grid)
+        const contactContainer = document.getElementById('contact-container');
+        const footerContainer = document.getElementById('footer-container');
+        const { contact } = portfolioData;
+
+        // Reset container class specifically for grid
+        contactContainer.className = "relative z-10 max-w-7xl mx-auto px-6";
+
+        // Title HTML
+        const titleParts = contact.title.split('\n');
+        const titleHtml = `
+            ${titleParts[0]} <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">
+                ${titleParts[1]}
+            </span>
+        `;
+
+        // Updated HTML Injection with Conditional Layouts
+        contactContainer.innerHTML = `
+            <!-- MOBILE LAYOUT (Simple Button) - Visible only on mobile (md:hidden) -->
+            <div class="md:hidden flex flex-col items-center text-center">
+                <div class="reveal-on-scroll">
+                    <h2 class="text-5xl font-bold text-white mb-8 tracking-tight">
+                        ${titleHtml}
+                    </h2>
+                    <p class="text-slate-400 text-xl mb-12">
+                        ${contact.subtitle}
+                    </p>
+                </div>
+
+                <div class="reveal-on-scroll flex flex-col items-center gap-6" style="transition-delay: 200ms;">
+                    <a href="mailto:${contact.email}" class="group relative inline-flex items-center gap-4 px-10 py-5 bg-white text-slate-950 rounded-full text-xl font-bold hover:scale-105 transition-transform duration-300">
+                        <i data-lucide="mail" class="w-6 h-6"></i>
+                        <span>${contact.email}</span>
+                    </a>
+
+                    <div class="flex items-center gap-6 mt-2">
+                        ${contact.socials.map(social => `
+                            <a href="${social.url}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                                <i data-lucide="${social.icon}" size="20"></i>
+                                <span class="font-medium">${social.name}</span>
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESKTOP LAYOUT (Grid + Form) - Visible only on desktop (hidden md:grid) -->
+            <div class="hidden md:grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+                <!-- Left: Text & Socials -->
+                <div class="text-left reveal-on-scroll">
+                    <h2 class="text-6xl font-bold text-white mb-6 tracking-tight">
+                        ${titleHtml}
+                    </h2>
+                    <p class="text-slate-400 text-xl mb-10 max-w-lg">
+                        ${contact.subtitle}
+                    </p>
+                    <div class="flex items-center justify-start gap-6">
+                        ${contact.socials.map(social => `
+                            <a href="${social.url}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                                <div class="p-3 bg-white/5 rounded-full group-hover:bg-white/10 transition-colors">
+                                    <i data-lucide="${social.icon}" size="20"></i>
+                                </div>
+                                <span class="font-medium">${social.name}</span>
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Right: Form -->
+                <div class="reveal-on-scroll" style="transition-delay: 200ms;">
+                    <form class="bg-slate-900/50 p-8 rounded-3xl border border-white/10 backdrop-blur-sm space-y-4 shadow-xl">
+                         <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2 text-left">
+                                <label class="text-sm font-medium text-slate-400 ml-1">Name</label>
+                                <input type="text" class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500 transition-colors" placeholder="Your name">
+                            </div>
+                            <div class="space-y-2 text-left">
+                                <label class="text-sm font-medium text-slate-400 ml-1">Email</label>
+                                <input type="email" class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500 transition-colors" placeholder="email@example.com">
+                            </div>
+                         </div>
+                         <div class="space-y-2 text-left">
+                            <label class="text-sm font-medium text-slate-400 ml-1">Message</label>
+                            <textarea rows="4" class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500 transition-colors resize-none" placeholder="How can I help you?"></textarea>
+                         </div>
+                         <button type="button" class="w-full py-4 bg-white text-slate-950 font-bold rounded-xl hover:bg-violet-500 hover:text-white transition-all transform active:scale-95">
+                            Send Message
+                         </button>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        footerContainer.innerHTML = contact.copyright;
+
+
+        // --- LOGIC & INTERACTIVITY ---
+
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Mobile Menu Logic
+        const menuBtn = document.getElementById('menu-toggle');
+        const menuOverlay = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        let isMenuOpen = false;
+
+        function toggleMenu() {
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                // Open state
+                menuOverlay.classList.remove('-translate-y-full', 'opacity-0', 'invisible');
+                menuOverlay.classList.add('translate-y-0', 'opacity-100', 'visible');
+                // Change icon to X
+                menuBtn.innerHTML = '<i data-lucide="x" width="24" height="24"></i>';
+            } else {
+                // Closed state
+                menuOverlay.classList.add('-translate-y-full', 'opacity-0', 'invisible');
+                menuOverlay.classList.remove('translate-y-0', 'opacity-100', 'visible');
+                // Change icon to Menu
+                menuBtn.innerHTML = '<i data-lucide="menu" width="24" height="24"></i>';
+            }
+            lucide.createIcons();
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+
+        // Smooth Scroll & Close Menu
+        function scrollToSection(e, id) {
+            e.preventDefault();
+            const element = document.getElementById(id);
+            if (element) {
+                // Directly close menu if open, without animation delay for the toggle itself
+                if (isMenuOpen) {
+                    toggleMenu();
+                }
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Active Link Highlighter on Scroll
+        window.addEventListener('scroll', () => {
+            const sections = ['hero', 'services', 'projects', 'contact'];
+            const scrollPosition = window.scrollY + 150;
+
+            sections.forEach(section => {
+                const element = document.getElementById(section);
+                if (element) {
+                    const offsetTop = element.offsetTop;
+                    const offsetHeight = element.offsetHeight;
+                    
+                    if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+                        updateActiveNav(section);
+                    }
+                }
+            });
+        });
+
+        function updateActiveNav(activeId) {
+            // Helper to reset classes
+            const resetLink = (el) => {
+                el.classList.remove('text-violet-400', 'font-bold', 'text-violet-500', 'bg-white/5', 'border-l-2', 'border-violet-500', 'rounded-l-none', 'bg-violet-600', 'border-violet-500');
+                el.classList.add('text-slate-300');
+            };
+
+            // Desktop Links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                resetLink(link);
+                if (link.dataset.target === activeId) {
+                    link.classList.remove('text-slate-300');
+                    link.classList.add('text-violet-400', 'font-bold');
+                }
+            });
+
+            // Desktop CTA
+            const ctaBtn = document.querySelector('.cta-btn');
+            ctaBtn.classList.remove('bg-violet-600', 'text-white', 'border-violet-500');
+            ctaBtn.classList.add('bg-white/10', 'text-white');
+            if (activeId === portfolioData.nav.ctaLink) {
+                 ctaBtn.classList.remove('bg-white/10');
+                 ctaBtn.classList.add('bg-violet-600', 'border-violet-500');
+            }
+
+            // Mobile Links
+            document.querySelectorAll('.mobile-link, .mobile-cta').forEach(link => {
+                 resetLink(link);
+                 if (link.dataset.target === activeId) {
+                    link.classList.remove('text-slate-300');
+                    link.classList.add('text-violet-500', 'font-bold', 'bg-white/5', 'border-l-2', 'border-violet-500', 'rounded-l-none');
+                 }
+            });
+        }
+
+        // Intersection Observer for Fade In
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '50px' });
+
+        // Ensure newly injected elements are observed
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+        // --- PROJECT CAROUSEL LOGIC ---
+        
+        let activeProjectId = null;
+        let visibleProjectIndex = 0;
+
+        function updateDots() {
+            const dots = document.querySelectorAll('.project-dot');
+            dots.forEach((dot, idx) => {
+                const project = portfolioData.projects.list[idx];
+                
+                // FIXED LOGIC: Mutually exclusive.
+                // 1. Jika ada project yang sedang dibuka (activeProjectId != null), HANYA dot project itu yang nyala.
+                // 2. Jika TIDAK ada yang dibuka, baru dot mengikuti posisi scroll (visibleProjectIndex).
+                let isActive = false;
+                
+                if (activeProjectId !== null) {
+                    isActive = (activeProjectId === project.id);
+                } else {
+                    isActive = (idx === visibleProjectIndex);
+                }
+
+                if (isActive) {
+                    // Active state: Remove gray, add violet + scale
+                    dot.classList.remove('bg-slate-700', 'hover:bg-slate-600');
+                    dot.classList.add('bg-violet-500', 'scale-125');
+                } else {
+                    // Inactive state: Remove violet + scale, add gray
+                    dot.classList.add('bg-slate-700', 'hover:bg-slate-600');
+                    dot.classList.remove('bg-violet-500', 'scale-125');
+                }
+            });
+        }
+
+        // Scroll Handler untuk Carousel
+        projectsCarousel.addEventListener('scroll', () => {
+            const scrollLeft = projectsCarousel.scrollLeft;
+            const itemWidth = projectsCarousel.scrollWidth / portfolioData.projects.list.length;
+            const newIndex = Math.round(scrollLeft / itemWidth);
+            
+            if (visibleProjectIndex !== newIndex) {
+                visibleProjectIndex = newIndex;
+                updateDots(); // Update dots berdasarkan scroll baru
+            }
+        });
+
+        function handleProjectClick(id) {
+            const project = portfolioData.projects.list.find(p => p.id === id);
+            const container = document.getElementById('project-details-container');
+            const cards = document.querySelectorAll('.project-card');
+            const arrowIndicators = document.querySelectorAll('.arrow-indicator');
+
+            // Toggle Logic
+            if (activeProjectId === id) {
+                // Close
+                container.classList.remove('open');
+                activeProjectId = null;
+                
+                // Reset Cards Styling
+                cards.forEach(c => {
+                    c.classList.remove('border-violet-500', 'ring-4', 'ring-violet-500/20', 'scale-[1.02]');
+                    c.classList.add('border-white/10', 'hover:border-white/30');
+                });
+                
+                // Reset Arrow Indicators
+                arrowIndicators.forEach(arrow => {
+                     arrow.classList.remove('opacity-100', 'translate-y-0');
+                     arrow.classList.add('opacity-0', 'translate-y-4');
+                });
+                
+            } else {
+                // Open / Switch
+                activeProjectId = id;
+                
+                // Update Content
+                document.getElementById('detail-title').textContent = project.title;
+                document.getElementById('detail-desc').textContent = project.description;
+                document.getElementById('detail-result').textContent = project.result;
+                
+                const stackContainer = document.getElementById('detail-stack');
+                stackContainer.innerHTML = '';
+                project.stack.forEach(tech => {
+                    stackContainer.innerHTML += `<span class="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-slate-300">${tech}</span>`;
+                });
+
+                // Open Container
+                container.classList.add('open');
+
+                // Styling Active Card
+                cards.forEach(c => {
+                    const cardArrow = c.querySelector('.arrow-indicator');
+                    if (Number(c.dataset.id) === id) {
+                        c.classList.remove('border-white/10', 'hover:border-white/30');
+                        c.classList.add('border-violet-500', 'ring-4', 'ring-violet-500/20', 'scale-[1.02]');
+                        
+                        // Force arrow visible on active
+                        cardArrow.classList.remove('opacity-0', 'translate-y-4', 'group-hover:opacity-100', 'group-hover:translate-y-0');
+                        cardArrow.classList.add('opacity-100', 'translate-y-0');
+                    } else {
+                        c.classList.add('border-white/10', 'hover:border-white/30');
+                        c.classList.remove('border-violet-500', 'ring-4', 'ring-violet-500/20', 'scale-[1.02]');
+                        
+                        // Reset arrow to hover-only
+                        cardArrow.classList.add('opacity-0', 'translate-y-4', 'group-hover:opacity-100', 'group-hover:translate-y-0');
+                        cardArrow.classList.remove('opacity-100', 'translate-y-0');
+                    }
+                });
+            }
+            // Update dots to reflect clicked state
+            updateDots();
+        }
+
+        function scrollToProject(index) {
+            const itemWidth = projectsCarousel.scrollWidth / portfolioData.projects.list.length;
+            projectsCarousel.scrollTo({
+                left: itemWidth * index,
+                behavior: 'smooth'
+            });
+            // Scroll listener will pick up the change and update dots
+        }
+
+        // Initial trigger to set first dot
+        updateDots();
+
+    </script>
+</body>
+</html>
+
+
