@@ -28,7 +28,6 @@
                     animation: {
                         'fade-in-up': 'fadeInUp 1s ease-out forwards',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        // UPDATED: Slower speed for desktop (20s) and mobile (15s) for better readability, linear for smoothness
                         'marquee': 'marquee 15s linear infinite', 
                         'marquee-desktop': 'marquee 25s linear infinite',
                     },
@@ -37,7 +36,6 @@
                             '0%': { opacity: '0', transform: 'translateY(2.5rem)' }, 
                             '100%': { opacity: '1', transform: 'translateY(0)' },
                         },
-                        // UPDATED: Move -100% relative to the element itself (Seamless Loop Strategy)
                         marquee: {
                             '0%': { transform: 'translateX(0)' },
                             '100%': { transform: 'translateX(-100%)' },
@@ -130,7 +128,7 @@
         <div class="flex-grow relative w-full">
             
             <!-- ========================================== -->
-            <!-- MOBILE HERO LAYOUT (UPDATED COMPACT & VISIBLE) -->
+            <!-- MOBILE HERO LAYOUT -->
             <!-- ========================================== -->
             <div class="md:hidden relative h-[100dvh] w-full flex flex-col justify-end pb-6"> 
                 <div class="absolute inset-0 z-0">
@@ -142,16 +140,13 @@
                 <div class="relative z-10 w-full px-6">
                     <div class="animate-fade-in-up">
                         <div class="flex flex-col items-start">
-                            <!-- Name -->
                             <h1 class="text-4xl font-bold tracking-tighter text-white leading-[0.9] mb-1">
                                 ARKANA <br> FAISAL RIDHO
                             </h1>
-                            <!-- Role -->
                             <div class="text-lg text-violet-400 font-medium tracking-wide mb-4">
                                 Full Stack Developer
                             </div>
                             
-                            <!-- Button -->
                             <a href="#projects" onclick="scrollToSection(event, 'projects')" class="inline-flex items-center gap-3 px-6 py-2.5 bg-white text-slate-950 rounded-full font-bold text-base hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_30px_-5px_rgba(255,255,255,0.3)] whitespace-nowrap">
                                 View Selected Work
                                 <i data-lucide="arrow-right" class="w-4 h-4 shrink-0"></i>
@@ -159,91 +154,36 @@
                         </div>
                     </div>
 
-                    <!-- MOBILE MARQUEE (UPDATED: True Infinite Loop) -->
+                    <!-- MOBILE MARQUEE (DYNAMIC CONTAINER) -->
                     <div class="mt-3 w-full max-w-sm overflow-hidden relative fade-in opacity-0" style="animation: fadeInUp 1s ease-out 0.3s forwards;">
                         <!-- Gradient Gates -->
                         <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-slate-950/80 to-transparent z-10 pointer-events-none"></div>
                         <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-950/80 to-transparent z-10 pointer-events-none"></div>
                         
-                        <!-- Wrapper for two groups -->
-                        <div class="flex w-fit">
-                            <!-- Group 1 -->
-                            <div class="animate-marquee flex gap-3 pr-3 whitespace-nowrap shrink-0">
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-express-original text-xs"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Express</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-mysql-plain text-xs text-blue-400"></i> <span class="text-[11px] font-medium uppercase tracking-wide">MySQL</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-redis-plain text-xs text-red-500"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Redis</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-nodejs-plain text-xs text-green-500"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Node.js</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-nestjs-plain text-xs text-red-600"></i> <span class="text-[11px] font-medium uppercase tracking-wide">NestJS</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-postgresql-plain text-xs text-blue-300"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Postgre</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-git-plain text-xs text-orange-500"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Git</span>
-                                </div>
-                            </div>
-
-                            <!-- Group 2 (Identical Copy) -->
-                            <div class="animate-marquee flex gap-3 pr-3 whitespace-nowrap shrink-0">
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-express-original text-xs"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Express</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-mysql-plain text-xs text-blue-400"></i> <span class="text-[11px] font-medium uppercase tracking-wide">MySQL</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-redis-plain text-xs text-red-500"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Redis</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-nodejs-plain text-xs text-green-500"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Node.js</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-nestjs-plain text-xs text-red-600"></i> <span class="text-[11px] font-medium uppercase tracking-wide">NestJS</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-postgresql-plain text-xs text-blue-300"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Postgre</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
-                                    <i class="devicon-git-plain text-xs text-orange-500"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Git</span>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Content Injected via JS -->
+                        <div class="flex w-fit" id="mobile-marquee-container"></div>
                     </div>
                 </div>
             </div>
 
             <!-- ========================================== -->
-            <!-- DESKTOP HERO LAYOUT (UPDATED) -->
+            <!-- DESKTOP HERO LAYOUT -->
             <!-- ========================================== -->
             <div class="hidden md:flex h-screen w-full items-center justify-center relative">
                 
-                <!-- 1. IMAGE LAYER (Right Side) -->
                 <div class="absolute right-0 top-0 bottom-0 w-[48%] translate-x-12 z-0">
                     <div class="w-full h-full hero-image-mask relative">
                         <img src="https://drive.google.com/thumbnail?id=1Epbh8rml0lTWO_YgeL4AnHAveTujnG6s&sz=w1920" alt="Portrait" class="w-full h-full object-cover object-top opacity-100">
                     </div>
                 </div>
 
-                <!-- 2. MASTER GRADIENT OVERLAY -->
                 <div class="absolute inset-0 z-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent pointer-events-none"></div>
                 
-                <!-- Additional Ambient Light -->
                 <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-slate-800/20 rounded-full blur-[100px] pointer-events-none"></div>
 
-                <!-- 3. CONTENT LAYER (Left Side) -->
                 <div class="relative z-10 max-w-7xl mx-auto w-full px-6 grid grid-cols-12 h-full items-center">
                     <div class="col-span-8 flex flex-col justify-center items-start">
                         
-                        <!-- Name & Role -->
                         <div class="animate-fade-in-up opacity-0" style="animation-delay: 200ms;">
                             <h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tighter text-white leading-[0.95] mb-2">
                                 ARKANA <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-500">FAISAL RIDHO</span>
@@ -254,16 +194,13 @@
                             </p>
                         </div>
 
-                        <!-- Description -->
                         <div class="animate-fade-in-up opacity-0 max-w-md" style="animation-delay: 300ms;">
                             <p class="text-slate-400 text-base xl:text-lg leading-relaxed mb-8 line-clamp-3">
                                 I craft high-performance digital experiences that merge art with engineering. Specialized in building scalable SaaS platforms and interactive web applications.
                             </p>
                         </div>
 
-                        <!-- CTA & MARQUEE BLOCK -->
                         <div class="animate-fade-in-up opacity-0 w-full" style="animation-delay: 400ms;">
-                            <!-- Button -->
                             <a href="#projects" onclick="scrollToSection(event, 'projects')" class="group inline-flex relative px-8 py-3 bg-white text-slate-950 rounded-full font-bold text-base xl:text-lg overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)]">
                                 <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-violet-200 via-white to-violet-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                 <span class="relative flex items-center gap-2">
@@ -271,70 +208,14 @@
                                 </span>
                             </a>
 
-                            <!-- DESKTOP MARQUEE (UPDATED: True Infinite Loop) -->
+                            <!-- DESKTOP MARQUEE (DYNAMIC CONTAINER) -->
                             <div class="mt-8 w-full max-w-lg overflow-hidden relative border-t border-white/5 pt-4">
                                 <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none"></div>
                                 <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none"></div>
                                 
-                                <div class="flex w-fit">
-                                    <!-- Group 1 -->
-                                    <div class="animate-marquee-desktop flex gap-4 pr-4 whitespace-nowrap shrink-0">
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-express-original text-base"></i> <span class="text-xs font-medium">Express.js</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-mysql-plain text-base text-blue-400"></i> <span class="text-xs font-medium">MySQL</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-redis-plain text-base text-red-500"></i> <span class="text-xs font-medium">Redis</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-nodejs-plain text-base text-green-500"></i> <span class="text-xs font-medium">Node.js</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-nestjs-plain text-base text-red-600"></i> <span class="text-xs font-medium">NestJS</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-postgresql-plain text-base text-blue-300"></i> <span class="text-xs font-medium">PostgreSQL</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-mongodb-plain text-base text-green-500"></i> <span class="text-xs font-medium">MongoDB</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-git-plain text-base text-orange-500"></i> <span class="text-xs font-medium">Git</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Group 2 -->
-                                    <div class="animate-marquee-desktop flex gap-4 pr-4 whitespace-nowrap shrink-0">
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-express-original text-base"></i> <span class="text-xs font-medium">Express.js</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-mysql-plain text-base text-blue-400"></i> <span class="text-xs font-medium">MySQL</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-redis-plain text-base text-red-500"></i> <span class="text-xs font-medium">Redis</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-nodejs-plain text-base text-green-500"></i> <span class="text-xs font-medium">Node.js</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-nestjs-plain text-base text-red-600"></i> <span class="text-xs font-medium">NestJS</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-postgresql-plain text-base text-blue-300"></i> <span class="text-xs font-medium">PostgreSQL</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-mongodb-plain text-base text-green-500"></i> <span class="text-xs font-medium">MongoDB</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
-                                            <i class="devicon-git-plain text-base text-orange-500"></i> <span class="text-xs font-medium">Git</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                <!-- Content Injected via JS -->
+                                <div class="flex w-fit" id="desktop-marquee-container"></div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -345,7 +226,6 @@
     </div>
 
     <!-- SERVICES SECTION -->
-    <!-- UPDATED: Added scroll-mt-24 for better anchor positioning -->
     <section id="services" class="scroll-mt-24 py-16 px-6 bg-slate-950 border-b border-white/5">
         <div class="max-w-7xl mx-auto">
             <div class="reveal-on-scroll mb-8 border-l-2 border-violet-500 pl-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -363,7 +243,6 @@
     </section>
 
     <!-- PROJECTS SECTION -->
-    <!-- UPDATED: Added scroll-mt-24 for better anchor positioning -->
     <section id="projects" class="scroll-mt-24 pt-10 pb-10 bg-slate-900 overflow-hidden flex flex-col transition-all duration-500">
         <div class="max-w-7xl mx-auto px-6 mb-0 flex items-end justify-between w-full">
             <div class="reveal-on-scroll">
@@ -434,7 +313,6 @@
     </section>
 
     <!-- CONTACT SECTION -->
-    <!-- UPDATED: Added scroll-mt-24 for better anchor positioning -->
     <section id="contact" class="scroll-mt-24 py-32 px-6 bg-slate-950 relative overflow-hidden">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-violet-600/20 rounded-full blur-[120px]"></div>
 
@@ -459,6 +337,17 @@
                 cta: "Get in Touch",
                 ctaLink: "contact"
             },
+            // NEW: Tech Stack Data for Marquee
+            techStack: [
+                { name: "Express", icon: "devicon-express-original", color: "text-slate-300" },
+                { name: "MySQL", icon: "devicon-mysql-plain", color: "text-blue-400" },
+                { name: "Redis", icon: "devicon-redis-plain", color: "text-red-500" },
+                { name: "Node.js", icon: "devicon-nodejs-plain", color: "text-green-500" },
+                { name: "NestJS", icon: "devicon-nestjs-plain", color: "text-red-600" },
+                { name: "Postgre", icon: "devicon-postgresql-plain", color: "text-blue-300" },
+                { name: "MongoDB", icon: "devicon-mongodb-plain", color: "text-green-500" },
+                { name: "Git", icon: "devicon-git-plain", color: "text-orange-500" }
+            ],
             services: {
                 list: [
                     {
@@ -572,7 +461,59 @@
             </a>
         `;
 
-        // 2. Render Services
+        // 2. Render Tech Stack Marquee (Dynamic)
+        // Function to generate badges based on style
+        const generateBadgesHTML = (isMobile) => {
+            return portfolioData.techStack.map(tech => {
+                // Mobile Styles: Compact, smaller text, tighter padding
+                const mobileClasses = "flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md";
+                const mobileIconSize = "text-xs";
+                const mobileTextSize = "text-[11px] font-medium uppercase tracking-wide";
+
+                // Desktop Styles: Slightly larger, hover effect
+                const desktopClasses = "flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors";
+                const desktopIconSize = "text-base";
+                const desktopTextSize = "text-xs font-medium";
+
+                const wrapperClass = isMobile ? mobileClasses : desktopClasses;
+                const iconSize = isMobile ? mobileIconSize : desktopIconSize;
+                const textSize = isMobile ? mobileTextSize : desktopTextSize;
+
+                return `
+                    <div class="${wrapperClass}">
+                        <i class="${tech.icon} ${iconSize} ${isMobile ? tech.color : ''}"></i> 
+                        <span class="${textSize}">${tech.name}</span>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        // Render Mobile Marquee
+        const mobileMarqueeContainer = document.getElementById('mobile-marquee-container');
+        const mobileBadges = generateBadgesHTML(true);
+        mobileMarqueeContainer.innerHTML = `
+            <div class="animate-marquee flex gap-3 pr-3 whitespace-nowrap shrink-0">
+                ${mobileBadges}
+            </div>
+            <div class="animate-marquee flex gap-3 pr-3 whitespace-nowrap shrink-0">
+                ${mobileBadges}
+            </div>
+        `;
+
+        // Render Desktop Marquee
+        const desktopMarqueeContainer = document.getElementById('desktop-marquee-container');
+        const desktopBadges = generateBadgesHTML(false);
+        desktopMarqueeContainer.innerHTML = `
+            <div class="animate-marquee-desktop flex gap-4 pr-4 whitespace-nowrap shrink-0">
+                ${desktopBadges}
+            </div>
+            <div class="animate-marquee-desktop flex gap-4 pr-4 whitespace-nowrap shrink-0">
+                ${desktopBadges}
+            </div>
+        `;
+
+
+        // 3. Render Services
         const servicesList = document.getElementById('services-list');
         portfolioData.services.list.forEach((service, idx) => {
             const delay = idx * 150;
@@ -591,7 +532,7 @@
             `;
         });
 
-        // 3. Render Projects
+        // 4. Render Projects
         const projectsCarousel = document.getElementById('projects-carousel');
         const projectDots = document.getElementById('project-dots');
 
@@ -633,7 +574,7 @@
             `;
         });
 
-        // 4. Render Contact & Footer (Responsive: Mobile Old Style, Desktop New Grid)
+        // 5. Render Contact & Footer (Responsive: Mobile Old Style, Desktop New Grid)
         const contactContainer = document.getElementById('contact-container');
         const footerContainer = document.getElementById('footer-container');
         const { contact } = portfolioData;
