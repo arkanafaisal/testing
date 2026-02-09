@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arkana Faisal Ridho | Full Stack Developer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Devicon (For Tech Stack Icons) -->
+    <link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config & Custom Styles -->
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                },
+                extend: {
+                    animation: {
+                        'fade-in-left': 'fadeInLeft 1s ease-out forwards',
+                        'fade-in-up': 'fadeInUp 1s ease-out forwards',
+                        'fade-in': 'fadeIn 1.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'marquee': 'marquee 15s linear infinite', 
+                        'marquee-desktop': 'marquee 25s linear infinite',
+                    },
+                    keyframes: {
+                        fadeInLeft: {
+                            '0%': { opacity: '0', transform: 'translateX(-2.5rem)' }, 
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(2.5rem)' }, 
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' }, 
+                            '100%': { opacity: '1' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar Hide */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Base Reveal Styles */
+        .reveal-on-scroll {
+            opacity: 0;
+            transition: all 1000ms cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+        }
+        .reveal-on-scroll.effect-fade { transform: translateY(0); }
+        .reveal-on-scroll.effect-left { transform: translateX(-3rem); }
+        .reveal-on-scroll.effect-right { transform: translateX(3rem); }
+        .reveal-on-scroll.is-visible { opacity: 1; transform: translate(0); }
+
+        .details-container {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+            overflow: hidden;
+            transition: all 700ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .details-container.open {
+            max-height: 1000px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+        
+        #mobile-menu {
+            transition-property: transform, opacity, visibility;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 500ms;
+        }
+
+        .hero-image-mask {
+            mask-image: linear-gradient(to right, transparent 0%, black 15%, black 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-violet-500 selection:text-white overflow-x-hidden">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-slate-950/50 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between relative z-50">
+            <div class="text-xl font-bold tracking-tight text-white drop-shadow-md">
+                ARKANA<span class="text-violet-500">.DEV</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300" id="desktop-nav"></div>
+            <button id="menu-toggle" class="md:hidden text-white p-2 cursor-pointer hover:bg-white/5 rounded-full transition-colors relative z-50" aria-label="Toggle menu">
+                <i data-lucide="menu" id="menu-icon"></i>
+            </button>
+        </div>
+        <div id="mobile-menu" class="absolute top-0 left-0 w-full h-auto bg-slate-950/90 backdrop-blur-md border-b border-white/10 shadow-2xl flex flex-col pt-20 pb-8 px-6 gap-2 md:hidden z-40 transform -translate-y-full opacity-0 invisible"></div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <div id="hero" class="relative min-h-screen w-full bg-slate-950 overflow-hidden flex flex-col">
+        <div class="flex-grow relative w-full">
+            
+            <!-- MOBILE HERO LAYOUT -->
+            <div class="md:hidden relative h-[100dvh] w-full flex flex-col justify-end pb-6"> 
+                <div class="absolute inset-0 z-0">
+                    <img src="https://drive.google.com/thumbnail?id=1Epbh8rml0lTWO_YgeL4AnHAveTujnG6s&sz=w1920" alt="Portrait" class="w-full h-full object-cover object-top">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent"></div>
+                </div>
+
+                <div class="relative z-10 w-full px-6">
+                    <div class="animate-fade-in-left">
+                        <div class="flex flex-col items-start">
+                            <h1 class="text-4xl font-bold tracking-tighter text-white leading-[0.9] mb-1">
+                                ARKANA <br> FAISAL RIDHO
+                            </h1>
+                            <div class="text-lg text-violet-400 font-medium tracking-wide mb-4">
+                                Full Stack Developer
+                            </div>
+                            
+                            <div class="animate-fade-in opacity-0" style="animation-delay: 300ms; animation-fill-mode: forwards;">
+                                <a href="#projects" onclick="scrollToSection(event, 'projects')" class="inline-flex items-center gap-3 px-6 py-2.5 bg-white text-slate-950 rounded-full font-bold text-base hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_30px_-5px_rgba(255,255,255,0.3)] whitespace-nowrap">
+                                    View Selected Work
+                                    <i data-lucide="arrow-right" class="w-4 h-4 shrink-0"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MOBILE MARQUEE (FIXED VISIBILITY) -->
+                    <!-- Changed: Removed inline style animation, added class animate-fade-in-up, ensure delay class works if configured or just use standard utility -->
+                    <div class="mt-4 w-full max-w-sm overflow-hidden relative opacity-0 animate-fade-in-up" style="animation-delay: 500ms;">
+                        <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-slate-950/80 to-transparent z-10 pointer-events-none"></div>
+                        <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-950/80 to-transparent z-10 pointer-events-none"></div>
+                        <div class="flex w-fit">
+                            <div id="mobile-marquee-group-1" class="animate-marquee flex gap-3 pr-3 whitespace-nowrap shrink-0"></div>
+                            <div id="mobile-marquee-group-2" class="animate-marquee flex gap-3 pr-3 whitespace-nowrap shrink-0"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESKTOP HERO LAYOUT -->
+            <div class="hidden md:flex h-screen w-full items-center justify-center relative">
+                <div class="absolute right-0 top-0 bottom-0 w-[48%] translate-x-12 z-0">
+                    <div class="w-full h-full hero-image-mask relative">
+                        <img src="https://drive.google.com/thumbnail?id=1Epbh8rml0lTWO_YgeL4AnHAveTujnG6s&sz=w1920" alt="Portrait" class="w-full h-full object-cover object-top opacity-100">
+                    </div>
+                </div>
+                <div class="absolute inset-0 z-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-slate-800/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+                <div class="relative z-10 max-w-7xl mx-auto w-full px-6 grid grid-cols-12 h-full items-center">
+                    <div class="col-span-8 flex flex-col justify-center items-start">
+                        <div class="animate-fade-in-left opacity-0" style="animation-delay: 200ms;">
+                            <h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tighter text-white leading-[0.95] mb-2">
+                                ARKANA <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-500">FAISAL RIDHO</span>
+                            </h1>
+                            <p class="text-xl xl:text-2xl text-violet-400 font-medium tracking-wide mb-6 flex items-center gap-3">
+                                <span class="h-[2px] w-8 bg-violet-500 inline-block"></span>
+                                Full Stack Developer
+                            </p>
+                        </div>
+                        <div class="animate-fade-in-left opacity-0 max-w-md" style="animation-delay: 400ms;">
+                            <p class="text-slate-400 text-base xl:text-lg leading-relaxed mb-8 line-clamp-3">
+                                I craft high-performance digital experiences that merge art with engineering. Specialized in building scalable SaaS platforms and interactive web applications.
+                            </p>
+                        </div>
+                        <div class="w-full">
+                            <div class="animate-fade-in opacity-0 inline-block" style="animation-delay: 600ms; animation-fill-mode: forwards;">
+                                <a href="#projects" onclick="scrollToSection(event, 'projects')" class="group inline-flex relative px-8 py-3 bg-white text-slate-950 rounded-full font-bold text-base xl:text-lg overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)]">
+                                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-violet-200 via-white to-violet-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <span class="relative flex items-center gap-2">
+                                        View Selected Work <i data-lucide="arrow-right" class="w-5 h-5 transition-transform group-hover:translate-x-1"></i>
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="mt-8 w-full max-w-lg overflow-hidden relative border-t border-white/5 pt-4 opacity-0 animate-fade-in-up" style="animation-delay: 800ms;">
+                                <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none"></div>
+                                <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none"></div>
+                                <div class="flex w-fit">
+                                    <div id="desktop-marquee-group-1" class="animate-marquee-desktop flex gap-4 pr-4 whitespace-nowrap shrink-0"></div>
+                                    <div id="desktop-marquee-group-2" class="animate-marquee-desktop flex gap-4 pr-4 whitespace-nowrap shrink-0"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTIONS -->
+    <section id="services" class="scroll-mt-24 py-16 px-6 bg-slate-950 border-b border-white/5">
+        <div class="max-w-7xl mx-auto">
+            <div class="reveal-on-scroll effect-left mb-8 border-l-2 border-violet-500 pl-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-1">Expertise</h2>
+                    <p class="text-slate-400 text-sm md:text-base">Strategic design solutions.</p>
+                </div>
+                <div class="hidden md:block h-[1px] flex-1 bg-white/10 ml-8 max-w-xs"></div>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5" id="services-list"></div>
+        </div>
+    </section>
+
+    <section id="projects" class="scroll-mt-24 pt-10 pb-10 bg-slate-900 overflow-hidden flex flex-col transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-6 mb-0 flex items-end justify-between w-full">
+            <div class="reveal-on-scroll effect-left">
+                <h2 class="text-4xl font-bold text-white mb-4">Selected Work</h2>
+                <p class="text-slate-400">Tap a project to view details.</p>
+            </div>
+            <div class="reveal-on-scroll effect-fade hidden md:flex gap-2 text-slate-500 items-center">
+                <span class="text-sm uppercase tracking-widest">Scroll</span>
+                <i data-lucide="move-right"></i>
+            </div>
+        </div>
+        <div class="reveal-on-scroll effect-fade" style="transition-delay: 200ms;">
+            <div id="projects-carousel" class="flex overflow-x-auto snap-x snap-mandatory gap-6 px-6 pt-4 pb-8 w-full no-scrollbar scroll-smooth"></div>
+        </div>
+        <div class="reveal-on-scroll effect-fade" style="transition-delay: 400ms;">
+            <div id="project-dots" class="flex justify-center gap-3 mt-2 mb-4"></div>
+        </div>
+        <div id="project-details-container" class="details-container w-full px-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="bg-slate-950/50 border border-white/10 rounded-3xl p-8 md:p-12 backdrop-blur-sm relative overflow-hidden transform transition-transform duration-500">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 text-white"><i data-lucide="code-2" width="120" height="120"></i></div>
+                    <div class="relative z-10 grid md:grid-cols-2 gap-12">
+                        <div>
+                            <div class="flex items-center gap-3 mb-6"><span class="h-px w-8 bg-violet-500"></span><span class="text-violet-400 font-bold uppercase tracking-widest text-sm">Project Details</span></div>
+                            <h3 id="detail-title" class="text-3xl md:text-4xl font-bold text-white mb-6"></h3>
+                            <p id="detail-desc" class="text-slate-300 text-lg leading-relaxed mb-8"></p>
+                            <a href="#" class="inline-flex items-center gap-2 text-white font-semibold hover:text-violet-400 transition-colors">View Case Study <i data-lucide="external-link" size="18"></i></a>
+                        </div>
+                        <div class="space-y-8 md:border-l md:border-white/10 md:pl-12">
+                            <div>
+                                <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Tech Stack</h4>
+                                <div id="detail-stack" class="flex flex-wrap gap-3"></div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Key Result</h4>
+                                <div class="flex items-start gap-3"><i data-lucide="check-circle-2" class="text-green-500 mt-1 shrink-0"></i><span id="detail-result" class="text-xl text-white font-medium"></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="scroll-mt-24 py-32 px-6 bg-slate-950 relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-violet-600/20 rounded-full blur-[120px]"></div>
+        <div id="contact-container" class="relative z-10 max-w-7xl mx-auto px-6"></div>
+        <footer id="footer-container" class="absolute bottom-6 left-0 right-0 text-center text-slate-600 text-sm"></footer>
+    </section>
+
+    <!-- TEMPLATES -->
+    <template id="tmpl-nav-desktop-link"><a href="#" class="nav-link transition-colors drop-shadow-sm hover:text-white"></a></template>
+    <template id="tmpl-nav-desktop-cta"><button class="cta-btn px-5 py-2.5 backdrop-blur-md border border-white/20 rounded-full transition-colors font-semibold bg-white/10 text-white hover:bg-white hover:text-slate-950"></button></template>
+    <template id="tmpl-nav-mobile-link"><a href="#" class="mobile-link text-base block w-full py-2 cursor-pointer transition-all rounded-lg px-2 text-slate-300 hover:text-white hover:bg-white/5"></a></template>
+    
+    <template id="tmpl-tech-badge-mobile">
+        <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900/60 border border-white/10 rounded-full text-slate-300 backdrop-blur-md">
+            <i class=""></i> <span class="text-[11px] font-medium uppercase tracking-wide"></span>
+        </div>
+    </template>
+    <template id="tmpl-tech-badge-desktop">
+        <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+            <i class=""></i> <span class="text-xs font-medium"></span>
+        </div>
+    </template>
+
+    <template id="tmpl-service-card">
+        <div class="reveal-on-scroll effect-fade h-full">
+            <div class="p-5 h-full rounded-xl bg-slate-900 border border-white/5 hover:border-violet-500/30 transition-all hover:bg-slate-900/80 group">
+                <div class="flex items-center gap-4 mb-3">
+                    <div class="p-2 bg-slate-950 rounded-lg shrink-0 group-hover:scale-110 transition-transform"><i class="w-5 h-5 text-violet-400"></i></div>
+                    <h3 class="service-title text-base font-bold text-white leading-tight"></h3>
+                </div>
+                <p class="service-desc text-slate-400 text-sm leading-relaxed"></p>
+            </div>
+        </div>
+    </template>
+
+    <template id="tmpl-project-card">
+        <div class="project-card snap-center shrink-0 w-[85vw] md:w-[600px] aspect-[16/10] relative rounded-3xl overflow-hidden group cursor-pointer border border-white/10 transition-all duration-300 hover:border-white/30 hover:scale-[1.01]">
+            <img src="" alt="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent opacity-90"></div>
+            <div class="absolute bottom-0 left-0 p-8 md:p-10 w-full">
+                <span class="project-category text-violet-400 text-sm font-bold uppercase tracking-wider mb-2 block"></span>
+                <div class="flex justify-between items-end">
+                    <h3 class="project-title text-3xl font-bold text-white"></h3>
+                    <div class="arrow-indicator w-12 h-12 rounded-full bg-white text-slate-950 flex items-center justify-center transition-all duration-300 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0"><i data-lucide="arrow-right" size="20"></i></div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <template id="tmpl-project-dot"><button class="project-dot h-2 w-2 rounded-full transition-all duration-300 cursor-pointer bg-slate-700 hover:bg-slate-600"></button></template>
+
+    <template id="tmpl-contact-mobile">
+        <div class="md:hidden flex flex-col items-center text-center w-full">
+            <div class="reveal-on-scroll effect-left w-full">
+                <h2 class="contact-title text-4xl sm:text-5xl font-bold text-white mb-8 tracking-tight"></h2>
+                <p class="contact-subtitle text-slate-400 text-lg sm:text-xl mb-12"></p>
+            </div>
+            <div class="reveal-on-scroll flex flex-col items-center gap-6 w-full" style="transition-delay: 200ms;">
+                <a href="#" class="contact-email-btn group relative inline-flex items-center justify-center gap-3 px-6 py-4 bg-white text-slate-950 rounded-full text-xs sm:text-sm font-bold hover:scale-105 transition-transform duration-300 max-w-full">
+                    <i data-lucide="mail" class="w-4 h-4 shrink-0"></i><span class="contact-email-text"></span>
+                </a>
+                <div class="contact-socials flex items-center gap-6 mt-2"></div>
+            </div>
+        </div>
+    </template>
+    <template id="tmpl-contact-desktop">
+        <div class="hidden md:grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+            <div class="text-left reveal-on-scroll effect-left">
+                <h2 class="contact-title text-6xl font-bold text-white mb-6 tracking-tight"></h2>
+                <p class="contact-subtitle text-slate-400 text-xl mb-10 max-w-lg"></p>
+                <div class="contact-socials flex items-center justify-start gap-6"></div>
+            </div>
+            <div class="reveal-on-scroll effect-fade" style="transition-delay: 200ms;">
+                <form class="bg-slate-900/50 p-8 rounded-3xl border border-white/10 backdrop-blur-sm space-y-4 shadow-xl">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2 text-left"><label class="text-sm font-medium text-slate-400 ml-1">Name</label><input type="text" class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500 transition-colors" placeholder="Your name"></div>
+                        <div class="space-y-2 text-left"><label class="text-sm font-medium text-slate-400 ml-1">Email</label><input type="email" class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500 transition-colors" placeholder="email@example.com"></div>
+                    </div>
+                    <div class="space-y-2 text-left"><label class="text-sm font-medium text-slate-400 ml-1">Message</label><textarea rows="4" class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500 transition-colors resize-none" placeholder="How can I help you?"></textarea></div>
+                    <button type="button" class="w-full py-4 bg-white text-slate-950 font-bold rounded-xl hover:bg-violet-500 hover:text-white transition-all transform active:scale-95">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </template>
+    <template id="tmpl-social-link"><a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"><i class="social-icon" size="20"></i><span class="social-name font-medium"></span></a></template>
+
+    <!-- LOGIC -->
+    <script>
+        const portfolioData = {
+            nav: {
+                links: [
+                    { name: "Services", href: "services" }, 
+                    { name: "Projects", href: "projects" }
+                ],
+                cta: "Get in Touch",
+                ctaLink: "contact"
+            },
+            techStack: [
+                { name: "Express", icon: "devicon-express-original", color: "text-slate-300" },
+                { name: "MySQL", icon: "devicon-mysql-plain", color: "text-blue-400" },
+                { name: "Redis", icon: "devicon-redis-plain", color: "text-red-500" },
+                { name: "Node.js", icon: "devicon-nodejs-plain", color: "text-green-500" },
+                { name: "NestJS", icon: "devicon-nestjs-plain", color: "text-red-600" },
+                { name: "Postgre", icon: "devicon-postgresql-plain", color: "text-blue-300" },
+                { name: "MongoDB", icon: "devicon-mongodb-plain", color: "text-green-500" },
+                { name: "Git", icon: "devicon-git-plain", color: "text-orange-500" }
+            ],
+            services: {
+                list: [
+                    {
+                        id: 1,
+                        icon: "layout",
+                        title: "Custom Websites",
+                        desc: "A website built exactly the way you want it."
+                    },
+                    {
+                        id: 2,
+                        icon: "smartphone",
+                        title: "Responsive Design",
+                        desc: "Looks great on phones, tablets, and computers."
+                    },
+                    {
+                        id: 3,
+                        icon: "sliders-horizontal",
+                        title: "Extra Features",
+                        desc: "AI chat, payments, WhatsApp, and Google Sheets."
+                    },
+                    {
+                        id: 4,
+                        icon: "refresh-cw",
+                        title: "Maintenance & Support",
+                        desc: "Help with updates, fixes, and ongoing support."
+                    }
+                ]
+            },
+            projects: {
+                list: [
+                    {
+                        id: 1,
+                        title: "Databox",
+                        category: "Public Data Storage Service",
+                        img: "https://images.unsplash.com/photo-1558494949-ef526b0042a0?q=80&w=2668&auto=format&fit=crop",
+                        description: "Designed and developed a REST API using Express.js for a public data storage service. Implemented JWT authentication, secured endpoints, managed MySQL database with Joi validation, and utilized Redis for rate limiting. Deployed to VPS using PM2 and Nginx.",
+                        stack: ["Express.js", "MySQL", "Redis"],
+                        result: "Deployed on VPS (Production)"
+                    },
+                    {
+                        id: 2,
+                        title: "Vocab Quiz API",
+                        category: "Educational App Backend",
+                        img: "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?q=80&w=2670&auto=format&fit=crop",
+                        description: "Developed a REST API for a vocabulary quiz application using Express.js. Managed MongoDB schemas and queries, and utilized Redis TTL for temporary data storage. Successfully deployed and debugged the application in a production environment.",
+                        stack: ["Express.js", "MongoDB", "Redis"],
+                        result: "Production-ready Quiz System"
+                    },
+                    {
+                        id: 3,
+                        title: "NGL Clone",
+                        category: "Social App Backend (In Progress)",
+                        img: "https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=2668&auto=format&fit=crop",
+                        description: "Building a modular backend using NestJS and Prisma ORM for an anonymous messaging platform clone. Managing PostgreSQL (Neon) integration, implementing secure JWT authentication, and robust rate limiting strategies.",
+                        stack: ["NestJS", "PostgreSQL", "Prisma"],
+                        result: "Modular Architecture Design"
+                    }
+                ]
+            },
+            contact: {
+                title: "Let's build something \nremarkable.", 
+                subtitle: "Currently available for select freelance opportunities.",
+                email: "arkana.faisal.r@gmail.com",
+                socials: [
+                    { name: "WhatsApp", url: "https://wa.me/6285791572090", icon: "message-circle" },
+                    { name: "Instagram", url: "https://www.instagram.com/arkanafrrr?igsh=Z3ZkM2hzMHA1aWxz", icon: "instagram" }
+                ],
+                copyright: `© ${new Date().getFullYear()} Arkana Faisal Ridho. All Rights Reserved.`
+            }
+        };
+
+        function renderTemplate(templateId, data, callback) {
+            const template = document.getElementById(templateId);
+            if (!template) return null;
+            const clone = template.content.cloneNode(true);
+            if (callback) callback(clone, data);
+            return clone;
+        }
+
+        const desktopNav = document.getElementById('desktop-nav');
+        const mobileNav = document.getElementById('mobile-menu');
+
+        portfolioData.nav.links.forEach(link => {
+            desktopNav.appendChild(renderTemplate('tmpl-nav-desktop-link', link, (clone, data) => {
+                const a = clone.querySelector('a'); a.href = `#${data.href}`; a.textContent = data.name; a.dataset.target = data.href; a.onclick = (e) => scrollToSection(e, data.href);
+            }));
+            mobileNav.appendChild(renderTemplate('tmpl-nav-mobile-link', link, (clone, data) => {
+                const a = clone.querySelector('a'); a.href = `#${data.href}`; a.textContent = data.name; a.dataset.target = data.href; a.onclick = (e) => scrollToSection(e, data.href);
+            }));
+        });
+
+        desktopNav.appendChild(renderTemplate('tmpl-nav-desktop-cta', portfolioData.nav, (clone, data) => {
+            const btn = clone.querySelector('button'); btn.textContent = data.cta; btn.onclick = (e) => scrollToSection(e, data.ctaLink); btn.dataset.target = data.ctaLink;
+        }));
+        mobileNav.appendChild(renderTemplate('tmpl-nav-mobile-link', portfolioData.nav, (clone, data) => {
+            const a = clone.querySelector('a'); a.href = `#${data.ctaLink}`; a.textContent = data.cta; a.dataset.target = data.ctaLink; a.classList.add('mobile-cta'); a.onclick = (e) => scrollToSection(e, data.ctaLink);
+        }));
+
+        const mobileMarqueeGroup1 = document.getElementById('mobile-marquee-group-1');
+        const mobileMarqueeGroup2 = document.getElementById('mobile-marquee-group-2');
+        const desktopMarqueeGroup1 = document.getElementById('desktop-marquee-group-1');
+        const desktopMarqueeGroup2 = document.getElementById('desktop-marquee-group-2');
+
+        portfolioData.techStack.forEach(tech => {
+            const appendMobileBadge = (group) => {
+                group.appendChild(renderTemplate('tmpl-tech-badge-mobile', tech, (clone, data) => {
+                    const i = clone.querySelector('i'); i.className = `${data.icon} text-xs ${data.color}`; clone.querySelector('span').textContent = data.name;
+                }));
+            };
+            appendMobileBadge(mobileMarqueeGroup1); appendMobileBadge(mobileMarqueeGroup2);
+
+            const appendDesktopBadge = (group) => {
+                group.appendChild(renderTemplate('tmpl-tech-badge-desktop', tech, (clone, data) => {
+                    const i = clone.querySelector('i'); i.className = `${data.icon} text-base ${data.color}`; clone.querySelector('span').textContent = data.name;
+                }));
+            };
+            appendDesktopBadge(desktopMarqueeGroup1); appendDesktopBadge(desktopMarqueeGroup2);
+        });
+
+        const servicesList = document.getElementById('services-list');
+        portfolioData.services.list.forEach((service, idx) => {
+            servicesList.appendChild(renderTemplate('tmpl-service-card', service, (clone, data) => {
+                clone.querySelector('.reveal-on-scroll').style.transitionDelay = `${idx * 150}ms`; clone.querySelector('i').setAttribute('data-lucide', data.icon); clone.querySelector('.service-title').textContent = data.title; clone.querySelector('.service-desc').textContent = data.desc;
+            }));
+        });
+
+        const projectsCarousel = document.getElementById('projects-carousel');
+        const projectDots = document.getElementById('project-dots');
+        portfolioData.projects.list.forEach((project, idx) => {
+            projectsCarousel.appendChild(renderTemplate('tmpl-project-card', project, (clone, data) => {
+                const card = clone.querySelector('.project-card'); card.dataset.id = data.id; card.onclick = () => handleProjectClick(data.id);
+                const img = clone.querySelector('img'); img.src = data.img; img.alt = data.title;
+                clone.querySelector('.project-category').textContent = data.category; clone.querySelector('.project-title').textContent = data.title;
+            }));
+            projectDots.appendChild(renderTemplate('tmpl-project-dot', project, (clone, data) => {
+                const btn = clone.querySelector('button'); btn.onclick = () => scrollToProject(idx); btn.ariaLabel = `View project ${data.title}`; btn.dataset.index = idx;
+            }));
+        });
+        const spacer = document.createElement('div'); spacer.className = "shrink-0 w-6"; projectsCarousel.appendChild(spacer);
+
+        const contactContainer = document.getElementById('contact-container');
+        const { contact } = portfolioData;
+        const formatTitle = (text) => { const parts = text.split('\n'); return `${parts[0]} <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">${parts[1]}</span>`; };
+
+        contactContainer.appendChild(renderTemplate('tmpl-contact-mobile', contact, (clone, data) => {
+            clone.querySelector('.contact-title').innerHTML = formatTitle(data.title); clone.querySelector('.contact-subtitle').textContent = data.subtitle;
+            const emailBtn = clone.querySelector('.contact-email-btn'); emailBtn.href = `mailto:${data.email}`; clone.querySelector('.contact-email-text').textContent = data.email;
+            const socialsContainer = clone.querySelector('.contact-socials');
+            data.socials.forEach(social => {
+                socialsContainer.appendChild(renderTemplate('tmpl-social-link', social, (clone, sData) => {
+                    const a = clone.querySelector('a'); a.href = sData.url; clone.querySelector('.social-icon').setAttribute('data-lucide', sData.icon); clone.querySelector('.social-name').textContent = sData.name;
+                }));
+            });
+        }));
+
+        contactContainer.appendChild(renderTemplate('tmpl-contact-desktop', contact, (clone, data) => {
+            clone.querySelector('.contact-title').innerHTML = formatTitle(data.title); clone.querySelector('.contact-subtitle').textContent = data.subtitle;
+            const socialsContainer = clone.querySelector('.contact-socials');
+            data.socials.forEach(social => {
+                socialsContainer.appendChild(renderTemplate('tmpl-social-link', social, (clone, sData) => {
+                    const a = clone.querySelector('a'); a.href = sData.url; clone.querySelector('.social-icon').setAttribute('data-lucide', sData.icon); clone.querySelector('.social-name').textContent = sData.name;
+                }));
+            });
+        }));
+
+        document.getElementById('footer-container').textContent = contact.copyright;
+
+        lucide.createIcons();
+
+        const menuBtn = document.getElementById('menu-toggle');
+        const menuOverlay = document.getElementById('mobile-menu');
+        let isMenuOpen = false;
+        function toggleMenu() {
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                menuOverlay.classList.remove('-translate-y-full', 'opacity-0', 'invisible'); menuOverlay.classList.add('translate-y-0', 'opacity-100', 'visible'); menuBtn.innerHTML = '<i data-lucide="x" width="24" height="24"></i>';
+            } else {
+                menuOverlay.classList.add('-translate-y-full', 'opacity-0', 'invisible'); menuOverlay.classList.remove('translate-y-0', 'opacity-100', 'visible'); menuBtn.innerHTML = '<i data-lucide="menu" width="24" height="24"></i>';
+            }
+            lucide.createIcons();
+        }
+        menuBtn.addEventListener('click', toggleMenu);
+
+        function scrollToSection(e, id) {
+            e.preventDefault();
+            const element = document.getElementById(id);
+            if (element) { if (isMenuOpen) toggleMenu(); element.scrollIntoView({ behavior: 'smooth' }); }
+        }
+
+        window.addEventListener('scroll', () => {
+            const sections = ['hero', 'services', 'projects', 'contact'];
+            const scrollPosition = window.scrollY + 150;
+            sections.forEach(section => {
+                const element = document.getElementById(section);
+                if (element) {
+                    const offsetTop = element.offsetTop;
+                    const offsetHeight = element.offsetHeight;
+                    if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) updateActiveNav(section);
+                }
+            });
+        });
+
+        function updateActiveNav(activeId) {
+            const resetLink = (el) => { el.classList.remove('text-violet-400', 'font-bold', 'text-violet-500', 'bg-white/5', 'border-l-2', 'border-violet-500', 'rounded-l-none', 'bg-violet-600', 'border-violet-500'); el.classList.add('text-slate-300'); };
+            document.querySelectorAll('.nav-link').forEach(link => {
+                resetLink(link); if (link.dataset.target === activeId) { link.classList.remove('text-slate-300'); link.classList.add('text-violet-400', 'font-bold'); }
+            });
+            const ctaBtn = document.querySelector('.cta-btn');
+            ctaBtn.classList.remove('bg-violet-600', 'text-white', 'border-violet-500'); ctaBtn.classList.add('bg-white/10', 'text-white');
+            if (activeId === portfolioData.nav.ctaLink) { ctaBtn.classList.remove('bg-white/10'); ctaBtn.classList.add('bg-violet-600', 'border-violet-500'); }
+            document.querySelectorAll('.mobile-link').forEach(link => {
+                 resetLink(link); if (link.dataset.target === activeId) { link.classList.remove('text-slate-300'); link.classList.add('text-violet-500', 'font-bold', 'bg-white/5', 'border-l-2', 'border-violet-500', 'rounded-l-none'); }
+            });
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); } });
+        }, { threshold: 0.1, rootMargin: '50px' });
+        setTimeout(() => { document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el)); }, 100);
+
+        let activeProjectId = null;
+        let visibleProjectIndex = 0;
+        function updateDots() {
+            const dots = document.querySelectorAll('.project-dot');
+            dots.forEach((dot, idx) => {
+                const project = portfolioData.projects.list[idx];
+                let isActive = (activeProjectId !== null) ? (activeProjectId === project.id) : (idx === visibleProjectIndex);
+                if (isActive) { dot.classList.remove('bg-slate-700', 'hover:bg-slate-600'); dot.classList.add('bg-violet-500', 'scale-125'); } else { dot.classList.add('bg-slate-700', 'hover:bg-slate-600'); dot.classList.remove('bg-violet-500', 'scale-125'); }
+            });
+        }
+
+        projectsCarousel.addEventListener('scroll', () => {
+            const scrollLeft = projectsCarousel.scrollLeft;
+            const itemWidth = projectsCarousel.scrollWidth / portfolioData.projects.list.length;
+            const newIndex = Math.round(scrollLeft / itemWidth);
+            if (visibleProjectIndex !== newIndex) { visibleProjectIndex = newIndex; updateDots(); }
+        });
+
+        function handleProjectClick(id) {
+            const project = portfolioData.projects.list.find(p => p.id === id);
+            const container = document.getElementById('project-details-container');
+            const cards = document.querySelectorAll('.project-card');
+            if (activeProjectId === id) {
+                container.classList.remove('open'); activeProjectId = null;
+                cards.forEach(c => {
+                    c.classList.remove('border-violet-500', 'ring-4', 'ring-violet-500/20', 'scale-[1.02]'); c.classList.add('border-white/10', 'hover:border-white/30');
+                    const arrow = c.querySelector('.arrow-indicator'); arrow.classList.remove('opacity-100', 'translate-y-0'); arrow.classList.add('opacity-0', 'translate-y-4');
+                });
+            } else {
+                activeProjectId = id;
+                document.getElementById('detail-title').textContent = project.title;
+                document.getElementById('detail-desc').textContent = project.description;
+                document.getElementById('detail-result').textContent = project.result;
+                const stackContainer = document.getElementById('detail-stack'); stackContainer.innerHTML = '';
+                project.stack.forEach(tech => { stackContainer.innerHTML += `<span class="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-slate-300">${tech}</span>`; });
+                container.classList.add('open');
+                cards.forEach(c => {
+                    const arrow = c.querySelector('.arrow-indicator');
+                    if (Number(c.dataset.id) === id) {
+                        c.classList.remove('border-white/10', 'hover:border-white/30'); c.classList.add('border-violet-500', 'ring-4', 'ring-violet-500/20', 'scale-[1.02]');
+                        arrow.classList.remove('opacity-0', 'translate-y-4', 'group-hover:opacity-100', 'group-hover:translate-y-0'); arrow.classList.add('opacity-100', 'translate-y-0');
+                    } else {
+                        c.classList.add('border-white/10', 'hover:border-white/30'); c.classList.remove('border-violet-500', 'ring-4', 'ring-violet-500/20', 'scale-[1.02]');
+                        arrow.classList.add('opacity-0', 'translate-y-4', 'group-hover:opacity-100', 'group-hover:translate-y-0'); arrow.classList.remove('opacity-100', 'translate-y-0');
+                    }
+                });
+            }
+            updateDots();
+        }
+
+        function scrollToProject(index) {
+            const itemWidth = projectsCarousel.scrollWidth / portfolioData.projects.list.length;
+            projectsCarousel.scrollTo({ left: itemWidth * index, behavior: 'smooth' });
+        }
+        updateDots();
+    </script>
+</body>
+</html>
+
+
