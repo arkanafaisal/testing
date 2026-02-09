@@ -28,7 +28,7 @@
                     animation: {
                         'fade-in-up': 'fadeInUp 1s ease-out forwards',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'marquee': 'marquee 40s linear infinite',
+                        'marquee': 'marquee 25s linear infinite', // Kecepatan disesuaikan agar nyaman
                     },
                     keyframes: {
                         fadeInUp: {
@@ -132,29 +132,83 @@
         <div class="flex-grow relative w-full">
             
             <!-- ========================================== -->
-            <!-- MOBILE HERO LAYOUT (Original) -->
+            <!-- MOBILE HERO LAYOUT (FIXED BOTTOM POSITIONING) -->
             <!-- ========================================== -->
-            <!-- UPDATED: Reduced pb-32 to pb-20 so content sits closer to the marquee -->
-            <div class="md:hidden relative h-full w-full flex items-end justify-start pt-28 pb-20"> 
+            <!-- FIX: Changed to h-screen to ensure full viewport height -->
+            <div class="md:hidden relative h-screen w-full overflow-hidden"> 
+                
+                <!-- Image Layer -->
                 <div class="absolute inset-0 z-0">
                     <img src="https://drive.google.com/thumbnail?id=1Epbh8rml0lTWO_YgeL4AnHAveTujnG6s&sz=w1920" alt="Portrait" class="w-full h-full object-cover object-top">
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
-                    <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent"></div>
+                    <!-- Updated Gradient: Stronger from bottom to make text readable on suit -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                    <!-- Extra gradient specifically for text area -->
+                    <div class="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent"></div>
                 </div>
 
-                <div class="relative z-10 w-full px-6">
+                <!-- Content Layer: Forced to Bottom using absolute positioning -->
+                <!-- FIX: Used absolute bottom-0 and pb-8 to sit low on the "empty space" -->
+                <div class="absolute bottom-0 left-0 w-full px-6 pb-8 z-10">
                     <div class="animate-fade-in-up">
                         <div class="flex flex-col items-start">
-                            <h1 class="text-5xl font-bold tracking-tighter text-white leading-[0.9] mb-6">
+                            <!-- Name -->
+                            <h1 class="text-4xl font-bold tracking-tighter text-white leading-[0.95] mb-2 drop-shadow-lg">
                                 ARKANA <br> FAISAL RIDHO
                             </h1>
-                            <div class="text-xl text-violet-400 font-medium tracking-wide mb-10">
+                            <!-- Role -->
+                            <div class="text-lg text-violet-400 font-medium tracking-wide mb-5 drop-shadow-md">
                                 Full Stack Developer
                             </div>
-                            <a href="#projects" onclick="scrollToSection(event, 'projects')" class="inline-flex items-center gap-4 px-8 py-4 bg-white text-slate-950 rounded-full font-bold text-lg hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_30px_-5px_rgba(255,255,255,0.3)] whitespace-nowrap">
+                            
+                            <!-- Button -->
+                            <a href="#projects" onclick="scrollToSection(event, 'projects')" class="inline-flex items-center gap-3 px-6 py-3 bg-white text-slate-950 rounded-full font-bold text-base hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_30px_-5px_rgba(255,255,255,0.3)] whitespace-nowrap">
                                 View Selected Work
-                                <i data-lucide="arrow-right" class="w-5 h-5 shrink-0"></i>
+                                <i data-lucide="arrow-right" class="w-4 h-4 shrink-0"></i>
                             </a>
+                        </div>
+                    </div>
+
+                    <!-- MOBILE MARQUEE -->
+                    <!-- Sits directly below button with small margin -->
+                    <div class="mt-6 w-full overflow-hidden relative hover-pause fade-in opacity-0" style="animation: fadeInUp 1s ease-out 0.3s forwards;">
+                        <!-- Gradient Gates for Marquee -->
+                        <div class="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none"></div>
+                        <div class="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none"></div>
+                        
+                        <div class="animate-marquee flex gap-3 whitespace-nowrap">
+                            <!-- Badges -->
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 border border-white/10 rounded-full text-slate-300 backdrop-blur-md shadow-sm">
+                                <i class="devicon-express-original text-xs"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Express</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 border border-white/10 rounded-full text-slate-300 backdrop-blur-md shadow-sm">
+                                <i class="devicon-mysql-plain text-xs text-blue-400"></i> <span class="text-[11px] font-medium uppercase tracking-wide">MySQL</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 border border-white/10 rounded-full text-slate-300 backdrop-blur-md shadow-sm">
+                                <i class="devicon-redis-plain text-xs text-red-500"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Redis</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 border border-white/10 rounded-full text-slate-300 backdrop-blur-md shadow-sm">
+                                <i class="devicon-nodejs-plain text-xs text-green-500"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Node.js</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 border border-white/10 rounded-full text-slate-300 backdrop-blur-md shadow-sm">
+                                <i class="devicon-nestjs-plain text-xs text-red-600"></i> <span class="text-[11px] font-medium uppercase tracking-wide">NestJS</span>
+                            </div>
+                            
+                            <!-- Duplicate Loop -->
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 border border-white/10 rounded-full text-slate-300 backdrop-blur-md shadow-sm">
+                                <i class="devicon-express-original text-xs"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Express</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 border border-white/10 rounded-full text-slate-300 backdrop-blur-md shadow-sm">
+                                <i class="devicon-mysql-plain text-xs text-blue-400"></i> <span class="text-[11px] font-medium uppercase tracking-wide">MySQL</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 border border-white/10 rounded-full text-slate-300 backdrop-blur-md shadow-sm">
+                                <i class="devicon-redis-plain text-xs text-red-500"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Redis</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 border border-white/10 rounded-full text-slate-300 backdrop-blur-md shadow-sm">
+                                <i class="devicon-nodejs-plain text-xs text-green-500"></i> <span class="text-[11px] font-medium uppercase tracking-wide">Node.js</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 border border-white/10 rounded-full text-slate-300 backdrop-blur-md shadow-sm">
+                                <i class="devicon-nestjs-plain text-xs text-red-600"></i> <span class="text-[11px] font-medium uppercase tracking-wide">NestJS</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -184,9 +238,11 @@
                         
                         <!-- Name & Role -->
                         <div class="animate-fade-in-up opacity-0" style="animation-delay: 200ms;">
-                            <h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tighter text-white leading-[0.95] mb-4">
+                            <!-- Reduced margin bottom for name to mb-2 -->
+                            <h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tighter text-white leading-[0.95] mb-2">
                                 ARKANA <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-500">FAISAL RIDHO</span>
                             </h1>
+                            <!-- Reduced margin bottom for role to mb-6 -->
                             <p class="text-xl xl:text-2xl text-violet-400 font-medium tracking-wide mb-6 flex items-center gap-3">
                                 <span class="h-[2px] w-8 bg-violet-500 inline-block"></span>
                                 Full Stack Developer
@@ -200,102 +256,78 @@
                             </p>
                         </div>
 
-                        <!-- CTA & Socials -->
-                        <div class="animate-fade-in-up opacity-0 flex items-center gap-6" style="animation-delay: 400ms;">
-                            <a href="#projects" onclick="scrollToSection(event, 'projects')" class="group relative px-8 py-4 bg-white text-slate-950 rounded-full font-bold text-base xl:text-lg overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)]">
+                        <!-- CTA & MARQUEE BLOCK -->
+                        <div class="animate-fade-in-up opacity-0 w-full" style="animation-delay: 400ms;">
+                            <!-- Button (Reduced padding to py-3) -->
+                            <a href="#projects" onclick="scrollToSection(event, 'projects')" class="group inline-flex relative px-8 py-3 bg-white text-slate-950 rounded-full font-bold text-base xl:text-lg overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)]">
                                 <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-violet-200 via-white to-violet-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                 <span class="relative flex items-center gap-2">
                                     View Selected Work <i data-lucide="arrow-right" class="w-5 h-5 transition-transform group-hover:translate-x-1"></i>
                                 </span>
                             </a>
 
-                            <!-- Mini Stats -->
-                            <div class="hidden xl:flex gap-8 border-l border-white/10 pl-8">
-                                <div>
-                                    <span class="block text-2xl font-bold text-white">5+</span>
-                                    <span class="text-xs text-slate-500 uppercase tracking-wider">Years Exp</span>
-                                </div>
-                                <div>
-                                    <span class="block text-2xl font-bold text-white">40+</span>
-                                    <span class="text-xs text-slate-500 uppercase tracking-wider">Projects</span>
+                            <!-- DESKTOP MARQUEE (Under CTA, Compact) -->
+                            <div class="mt-8 w-full max-w-lg overflow-hidden relative hover-pause border-t border-white/5 pt-4">
+                                <!-- Gradient Gates -->
+                                <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none"></div>
+                                <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none"></div>
+                                
+                                <div class="animate-marquee flex gap-4 whitespace-nowrap">
+                                    <!-- Original Badges -->
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-express-original text-base"></i> <span class="text-xs font-medium">Express.js</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-mysql-plain text-base text-blue-400"></i> <span class="text-xs font-medium">MySQL</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-redis-plain text-base text-red-500"></i> <span class="text-xs font-medium">Redis</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-nodejs-plain text-base text-green-500"></i> <span class="text-xs font-medium">Node.js</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-nestjs-plain text-base text-red-600"></i> <span class="text-xs font-medium">NestJS</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-postgresql-plain text-base text-blue-300"></i> <span class="text-xs font-medium">PostgreSQL</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-mongodb-plain text-base text-green-500"></i> <span class="text-xs font-medium">MongoDB</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-git-plain text-base text-orange-500"></i> <span class="text-xs font-medium">Git</span>
+                                    </div>
+
+                                    <!-- Duplicate Badges -->
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-express-original text-base"></i> <span class="text-xs font-medium">Express.js</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-mysql-plain text-base text-blue-400"></i> <span class="text-xs font-medium">MySQL</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-redis-plain text-base text-red-500"></i> <span class="text-xs font-medium">Redis</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-nodejs-plain text-base text-green-500"></i> <span class="text-xs font-medium">Node.js</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-nestjs-plain text-base text-red-600"></i> <span class="text-xs font-medium">NestJS</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-postgresql-plain text-base text-blue-300"></i> <span class="text-xs font-medium">PostgreSQL</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-mongodb-plain text-base text-green-500"></i> <span class="text-xs font-medium">MongoDB</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition-colors">
+                                        <i class="devicon-git-plain text-base text-orange-500"></i> <span class="text-xs font-medium">Git</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- TECH STACK MARQUEE (New Feature) -->
-        <!-- ========================================== -->
-        <div class="absolute bottom-0 left-0 right-0 z-20 w-full bg-slate-950/30 backdrop-blur-sm border-t border-white/5 py-4 hover-pause">
-            <!-- Left Gradient Gate -->
-            <div class="absolute top-0 left-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none"></div>
-            <!-- Right Gradient Gate -->
-            <div class="absolute top-0 right-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none"></div>
-
-            <div class="overflow-hidden flex">
-                <!-- Track -->
-                <div class="animate-marquee flex gap-8 whitespace-nowrap px-4">
-                    <!-- Tech Badges (Duplicated for seamless loop) -->
-                    <!-- Original Set -->
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-express-original text-lg"></i> <span class="text-sm font-medium">Express.js</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-mysql-plain text-lg text-blue-400"></i> <span class="text-sm font-medium">MySQL</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-redis-plain text-lg text-red-500"></i> <span class="text-sm font-medium">Redis</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i data-lucide="network" class="w-5 h-5 text-green-400"></i> <span class="text-sm font-medium">WebSocket</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-nodejs-plain text-lg text-green-500"></i> <span class="text-sm font-medium">Node.js</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-nestjs-plain text-lg text-red-600"></i> <span class="text-sm font-medium">NestJS</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-postgresql-plain text-lg text-blue-300"></i> <span class="text-sm font-medium">PostgreSQL</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-mongodb-plain text-lg text-green-500"></i> <span class="text-sm font-medium">MongoDB</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-git-plain text-lg text-orange-500"></i> <span class="text-sm font-medium">Git</span>
-                    </div>
-
-                    <!-- Duplicated Set (For infinite scroll) -->
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-express-original text-lg"></i> <span class="text-sm font-medium">Express.js</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-mysql-plain text-lg text-blue-400"></i> <span class="text-sm font-medium">MySQL</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-redis-plain text-lg text-red-500"></i> <span class="text-sm font-medium">Redis</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i data-lucide="network" class="w-5 h-5 text-green-400"></i> <span class="text-sm font-medium">WebSocket</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-nodejs-plain text-lg text-green-500"></i> <span class="text-sm font-medium">Node.js</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-nestjs-plain text-lg text-red-600"></i> <span class="text-sm font-medium">NestJS</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-postgresql-plain text-lg text-blue-300"></i> <span class="text-sm font-medium">PostgreSQL</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-mongodb-plain text-lg text-green-500"></i> <span class="text-sm font-medium">MongoDB</span>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300">
-                        <i class="devicon-git-plain text-lg text-orange-500"></i> <span class="text-sm font-medium">Git</span>
                     </div>
                 </div>
             </div>
@@ -923,6 +955,7 @@
     </script>
 </body>
 </html>
+
 
 
 
