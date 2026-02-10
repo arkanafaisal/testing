@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vocab Master</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            400: '#2dd4bf', 
+                            500: '#14b8a6', // Teal-500
+                            600: '#0d9488', // Teal-600
+                            700: '#0f766e', // Teal-700
+                        },
+                        secondary: '#f59e0b', // Amber-500
+                    },
+                    fontFamily: {
+                        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                    animation: {
+                        'shake': 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
+                        'pop-in': 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'gradient-x': 'gradient-x 1.5s ease infinite',
+                        'fill-bar': 'fill-bar 1s linear forwards',
+                        'spin-fast': 'spin 0.7s linear infinite',
+                    },
+                    keyframes: {
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.9)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' }
+                        },
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            },
+                        },
+                        'fill-bar': {
+                            '0%': { width: '0%' },
+                            '100%': { width: '100%' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons & Styles -->
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen w-full selection:bg-primary-100 selection:text-primary-700">
+    <div id="root" class="h-full w-full"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- UTILS ---
+        const formatScore = (num) => {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+            }
+            return num.toLocaleString();
+        };
+
+        // --- ICONS ---
+        const IconUser = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+        const IconPlay = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>;
+        const IconTrophy = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
+        const IconLogOut = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>;
+        const IconLogIn = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>;
+        const IconLock = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+        const IconAlert = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>;
+        const IconX = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
+        const IconInfo = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>;
+        const IconRefresh = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>;
+        const IconCheck = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>;
+
+        // --- COMPONENTS ---
+        
+        const FunLoader = () => (
+            <div className="flex flex-col items-center justify-center h-64 w-full fade-in">
+                <div className="w-12 h-12 mb-6 rounded-full border-4 border-transparent border-t-pink-500 border-r-purple-500 border-b-cyan-500 border-l-yellow-500 animate-spin-fast shadow-lg"></div>
+                <p className="text-slate-400 font-bold animate-pulse text-lg tracking-wide">MEMUAT SOAL...</p>
+            </div>
+        );
+
+        const AuthModal = ({ isOpen, onClose, onLogin }) => {
+            const [isLogin, setIsLogin] = useState(true);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState("");
+            
+            const usernameRef = useRef();
+            const passwordRef = useRef();
+            const confirmPasswordRef = useRef();
+
+            useEffect(() => {
+                if(isOpen) {
+                    setError("");
+                    if(usernameRef.current) usernameRef.current.value = "";
+                    if(passwordRef.current) passwordRef.current.value = "";
+                    if(confirmPasswordRef.current) confirmPasswordRef.current.value = "";
+                }
+            }, [isOpen, isLogin]);
+
+            if (!isOpen) return null;
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                setError("");
+                const username = usernameRef.current.value.trim();
+                const password = passwordRef.current.value;
+                const confirmPassword = !isLogin ? confirmPasswordRef.current.value : null;
+
+                if (!username) { setError("Username wajib diisi"); return; }
+                const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+                if (!usernameRegex.test(username)) { setError("Username hanya boleh huruf, angka, - dan _"); return; }
+                if (!password) { setError("Password wajib diisi"); return; }
+
+                if (!isLogin) {
+                    if (!confirmPassword) { setError("Konfirmasi password wajib diisi"); return; }
+                    if (password !== confirmPassword) { setError("Password tidak cocok"); return; }
+                }
+
+                setLoading(true);
+
+                setTimeout(() => {
+                    setLoading(false);
+                    if (!isLogin && username.toLowerCase() === "asd") { setError("Username 'asd' sudah digunakan"); return; }
+                    if (isLogin) {
+                        if (username !== "asd" || password !== "asd") { setError("Username atau password salah"); return; }
+                    }
+                    if (username.toLowerCase() === "limit") { setError("Terlalu banyak request. Coba lagi nanti (429)"); return; }
+                    if (username.toLowerCase() === "error") { setError("Koneksi gagal. Periksa internet Anda"); return; }
+                    onLogin({ username: username, score: 0 });
+                }, 1500);
+            };
+
+            const gradientBtnClass = "bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 text-white animate-gradient-x bg-[length:200%_200%]";
+            const normalBtnClass = "bg-primary-600 hover:bg-primary-700 text-white";
+
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm fade-in">
+                    <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl animate-pop-in relative overflow-hidden">
+                        <button onClick={onClose} className="absolute top-3 right-3 z-20 p-2 text-white/80 hover:text-white bg-black/10 hover:bg-black/20 rounded-full transition-all"><IconX /></button>
+                        <div className="bg-primary-600 px-6 py-6 text-center relative overflow-hidden">
+                            <h1 className="text-2xl font-bold text-white mb-1 relative z-10">Vocab Master</h1>
+                            <div className="relative h-5 w-full">
+                                <p className={`text-primary-100 text-sm absolute w-full transition-all duration-500 ease-in-out transform ${isLogin ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'}`}>Welcome back!</p>
+                                <p className={`text-primary-100 text-sm absolute w-full transition-all duration-500 ease-in-out transform ${!isLogin ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>Join us now!</p>
+                            </div>
+                        </div>
+
+                        <div className="p-6">
+                            {isLogin && (
+                                <div className="mb-4 bg-blue-50 border border-blue-100 rounded-lg p-3 flex items-start gap-3">
+                                    <div className="mt-0.5 text-blue-500 shrink-0"><IconInfo /></div>
+                                    <div className="text-xs text-blue-700">
+                                        <p className="font-bold mb-0.5">Akun Demo:</p>
+                                        <p>Username: <code className="bg-blue-100 px-1 py-0.5 rounded font-mono font-bold">asd</code></p>
+                                        <p>Password: <code className="bg-blue-100 px-1 py-0.5 rounded font-mono font-bold">asd</code></p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className={`mb-3 rounded-lg text-xs flex items-center gap-2 overflow-hidden transition-all duration-300 ease-in-out ${error ? 'bg-red-50 text-red-600 p-2.5 max-h-20 opacity-100 border border-red-100' : 'max-h-0 opacity-0'}`}>
+                                <IconAlert />
+                                <span className="font-medium leading-tight">{error}</span>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1">Username</label>
+                                    <div className="relative"><div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><IconUser /></div><input ref={usernameRef} type="text" maxLength="15" className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all invalid:ring-red-500" placeholder="user_123" /></div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                                    <div className="relative"><div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><IconLock /></div><input ref={passwordRef} type="password" maxLength="255" className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all" placeholder="••••••••" /></div>
+                                </div>
+                                <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isLogin ? 'max-h-0 opacity-0' : 'max-h-32 opacity-100'}`}>
+                                    <div className="pt-1"><label className="block text-xs font-semibold text-slate-600 mb-1">Confirm Password</label><div className="relative"><div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><IconLock /></div><input ref={confirmPasswordRef} type="password" maxLength="255" disabled={isLogin} className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-inset focus:bg-white transition-all" placeholder="••••••••" /></div></div>
+                                </div>
+                                
+                                <button type="submit" disabled={loading} className={`mt-2 w-full py-2.5 rounded-lg font-bold text-sm transition-all shadow-md flex justify-center items-center gap-2 min-h-[44px] ${loading ? gradientBtnClass + ' cursor-wait' : (isLogin ? normalBtnClass : gradientBtnClass)}`}>
+                                    {loading ? (
+                                        <span className="flex items-center gap-2">Processing...</span>
+                                    ) : (
+                                        <span className="transition-all duration-300">{isLogin ? "Sign In" : "Create Account"}</span>
+                                    )}
+                                </button>
+                            </form>
+
+                            <div className="mt-4 text-center flex flex-col gap-2">
+                                <p className="text-xs text-slate-500">{isLogin ? "Belum punya akun? " : "Sudah punya akun? "} <button onClick={() => setIsLogin(!isLogin)} className="text-primary-600 font-bold hover:underline focus:outline-none transition-colors">{isLogin ? "Daftar" : "Masuk"}</button></p>
+                                <button onClick={onClose} className="text-xs text-slate-400 hover:text-slate-600 transition-colors font-medium py-1">Nanti dulu aja</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const QuizScreen = ({ score, setScore, question, setQuestion, onNextQuestion }) => {
+            const [selectedAnswer, setSelectedAnswer] = useState(null); 
+            const [isValidating, setIsValidating] = useState(false); 
+            const [feedback, setFeedback] = useState(null); 
+            const [isTransitioning, setIsTransitioning] = useState(false); 
+
+            if (!question) {
+                return <FunLoader />;
+            }
+
+            const handleAnswer = (choice) => {
+                if (selectedAnswer || isValidating) return; 
+
+                setSelectedAnswer(choice);
+                setIsValidating(true); 
+
+                setTimeout(() => {
+                    setIsValidating(false);
+                    const isCorrect = choice === question.answer; 
+                    
+                    if (isCorrect) {
+                        setFeedback('correct');
+                        setScore(prev => prev + 10);
+                    } else {
+                        setFeedback('wrong');
+                    }
+
+                    setTimeout(() => {
+                        setIsTransitioning(true); 
+                        setTimeout(() => {
+                            onNextQuestion(); 
+                            setSelectedAnswer(null);
+                            setFeedback(null);
+                            setIsTransitioning(false); 
+                        }, 300); // 300ms delay
+                    }, 1500); 
+                }, 1000); 
+            };
+
+            const containerClass = isTransitioning ? "opacity-0 scale-95 transition-all duration-300" : "opacity-100 scale-100 transition-all duration-500 ease-out";
+
+            return (
+                <div className={`w-full h-full flex items-center justify-center p-4 fade-in ${containerClass}`}>
+                    
+                    {/* CARD LAYOUT - CENTERED & COMPACT */}
+                    <div className="w-full max-w-lg bg-white rounded-3xl shadow-xl border border-slate-100 flex flex-col overflow-hidden max-h-[85vh]">
+                        
+                        {/* HEADER: SCORE & LABEL */}
+                        <div className="bg-slate-50 border-b border-slate-100 px-5 py-3 flex items-center justify-between shrink-0">
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Question</span>
+                            <div className="bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase leading-none mt-[1px]">Score</span>
+                                <span className="text-sm font-bold text-primary-600 leading-none">{formatScore(score)}</span>
+                            </div>
+                        </div>
+
+                        {/* CONTENT: QUESTION WORD - SCROLLABLE IF NEEDED */}
+                        <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+                            <div className="px-6 py-6 text-center">
+                                <h2 className="text-slate-400 text-xs mb-1">Apa arti kata:</h2>
+                                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 break-words leading-tight">
+                                    {question.vocab}
+                                </h1>
+                            </div>
+
+                            {/* ANSWERS LIST - VERTICAL FLEX */}
+                            <div className="px-4 pb-4">
+                                <div className="flex flex-col gap-2"> 
+                                    {question.choices.map((choice, idx) => {
+                                        let btnClass = "bg-slate-50 text-slate-600 hover:bg-white hover:border-primary-200 border-2 border-transparent shadow-sm overflow-hidden relative";
+                                        
+                                        if (selectedAnswer) {
+                                            if (selectedAnswer === choice) {
+                                                if (isValidating) {
+                                                    btnClass = "bg-white text-slate-800 border-amber-300 shadow-md relative overflow-hidden"; 
+                                                } else {
+                                                    if (choice === question.answer) {
+                                                        btnClass = "bg-green-500 text-white border-green-600 shadow-green-200 scale-[1.02]";
+                                                    } else {
+                                                        btnClass = "bg-red-500 text-white border-red-600 shadow-red-200";
+                                                    }
+                                                }
+                                            } else {
+                                                btnClass = "bg-slate-50 text-slate-300 opacity-50 cursor-not-allowed";
+                                            }
+                                        }
+
+                                        return (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleAnswer(choice)}
+                                                disabled={!!selectedAnswer}
+                                                className={`
+                                                    ${btnClass} w-full
+                                                    py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 
+                                                    active:scale-[0.98] flex items-center justify-center min-h-[48px] text-center
+                                                `}
+                                            >
+                                                {isValidating && selectedAnswer === choice && (
+                                                    <div className="absolute inset-0 bg-amber-300 animate-fill-bar origin-left z-0 opacity-50"></div>
+                                                )}
+                                                <span className="relative z-10 break-words w-full">{choice}</span>
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* FOOTER: FEEDBACK - FIXED HEIGHT */}
+                        <div className="bg-slate-50 border-t border-slate-100 h-12 flex items-center justify-center shrink-0">
+                             {!isValidating && feedback === 'correct' && <span className="text-green-600 font-bold text-sm animate-bounce">Benar! 🎉</span>}
+                             {!isValidating && feedback === 'wrong' && <span className="text-red-500 font-bold text-sm">Yah, salah. Coba lagi!</span>}
+                             {/* Empty state holder */}
+                             {!selectedAnswer && !feedback && <span className="text-slate-300 text-xs italic">Pilih jawaban yang benar</span>}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const LeaderboardScreen = ({ currentUser }) => {
+            const defaultUsers = [
+                { rank: 1, username: "SultanVocab", score: 5000 },
+                { rank: 2, username: "WordMaster99", score: 4200 },
+                { rank: 3, username: "BudiGaming", score: 3850 },
+                { rank: 4, username: "EkoPemenang", score: 1600 },
+                { rank: 5, username: "SitiJuara", score: 450 },
+                { rank: 6, username: "Newbie123", score: 100 },
+                { rank: 7, username: "AsepKnalpot", score: 90 },
+                { rank: 8, username: "DedenStiker", score: 80 },
+                { rank: 9, username: "UjangRacing", score: 70 },
+                { rank: 10, username: "MamatBakso", score: 60 },
+                { rank: 11, username: "Kiki", score: 50 },
+                { rank: 12, username: "Lala", score: 40 },
+                { rank: 13, username: "Dipsy", score: 30 },
+                { rank: 14, username: "LongUsernameExampleTest123", score: 12500 }, // Added long name for testing
+                { rank: 15, username: "RichPlayer", score: 2500000 }, // Added million score for testing
+            ];
+
+            const [users, setUsers] = useState(() => {
+                let currentList = [...defaultUsers];
+                if (currentUser && currentUser.username !== "Guest") {
+                    const exists = currentList.find(u => u.username === currentUser.username);
+                    if (!exists) {
+                        currentList.push({ username: currentUser.username, score: currentUser.score });
+                    } else {
+                        exists.score = currentUser.score;
+                    }
+                }
+                return currentList.sort((a,b) => b.score - a.score).map((u, i) => ({...u, rank: i+1}));
+            });
+
+            const [refreshStatus, setRefreshStatus] = useState('idle'); 
+            const [cooldown, setCooldown] = useState(0);
+
+            useEffect(() => {
+                let interval;
+                if (cooldown > 0) {
+                    interval = setInterval(() => setCooldown(c => c - 1), 1000);
+                } else if (cooldown === 0 && refreshStatus === 'cooldown') {
+                    setRefreshStatus('idle');
+                }
+                return () => clearInterval(interval);
+            }, [cooldown, refreshStatus]);
+
+            const handleRefresh = () => {
+                if (refreshStatus !== 'idle') return;
+
+                setRefreshStatus('loading');
+                
+                setTimeout(() => {
+                    setRefreshStatus('success'); 
+                    setTimeout(() => {
+                        setRefreshStatus('cooldown');
+                        setCooldown(5); 
+                    }, 1500);
+                }, 1000);
+            };
+            
+            const currentUsername = currentUser ? currentUser.username : "Guest";
+            const myRankData = users.find(u => u.username === currentUsername);
+
+            let btnContent;
+            let btnClass = "w-full py-4 rounded-2xl transition-all flex items-center justify-center gap-2 font-bold shadow-md text-sm md:text-base ";
+            
+            switch(refreshStatus) {
+                case 'loading':
+                    btnClass += "bg-slate-100 text-slate-500 cursor-wait border border-slate-200";
+                    btnContent = <><span className="animate-spin h-4 w-4 border-2 border-slate-400 border-t-slate-600 rounded-full"></span> Updating...</>;
+                    break;
+                case 'success':
+                    btnClass += "bg-green-100 text-green-700 border border-green-200";
+                    btnContent = <><IconCheck size={18}/> Updated Successfully</>;
+                    break;
+                case 'cooldown':
+                    btnClass += "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-100";
+                    btnContent = <>Wait {cooldown}s</>;
+                    break;
+                default:
+                    btnClass += "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg active:scale-[0.98]";
+                    btnContent = <><IconRefresh size={18} /> Refresh Leaderboard</>;
+            }
+
+            return (
+                <div className="w-full max-w-2xl mx-auto p-4 flex flex-col h-full fade-in pb-10">
+                    <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 flex flex-col h-[75vh] relative mb-4">
+                        
+                        {/* HEADER - CENTERED TITLE */}
+                        <div className="bg-slate-900 p-4 relative flex items-center justify-center text-white shrink-0 shadow-md z-20">
+                            <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2 tracking-wide"><IconTrophy /> LEADERBOARD</h2>
+                        </div>
+
+                        {/* TABLE HEADERS - FIXED LAYOUT */}
+                        <div className="bg-slate-50 border-b border-slate-200 px-2 shrink-0">
+                             <table className="w-full table-fixed">
+                                <thead className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                                    <tr>
+                                        <th className="px-4 py-3 text-center w-[15%]">#</th>
+                                        <th className="px-4 py-3 text-left w-[60%]">Player</th>
+                                        <th className="px-4 py-3 text-right w-[25%]">Pts</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+                        {/* LIST - FIXED LAYOUT */}
+                        <div className="flex-1 overflow-y-auto custom-scrollbar p-0 bg-white">
+                            <table className="w-full border-collapse table-fixed">
+                                <tbody className="text-sm md:text-base">
+                                    {users.map((user) => (
+                                        <tr key={user.rank} className={`border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors ${user.username === currentUsername ? "bg-primary-50 hover:bg-primary-100" : ""}`}>
+                                            <td className="px-4 py-3 font-medium w-[15%] text-center text-slate-500">{user.rank === 1 ? '🥇' : user.rank === 2 ? '🥈' : user.rank === 3 ? '🥉' : user.rank}</td>
+                                            <td className={`px-4 py-3 font-semibold w-[60%] ${user.username === currentUsername ? "text-primary-700" : "text-slate-700"}`}>
+                                                <div className="truncate w-full">
+                                                    {user.username}
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 text-right font-mono text-slate-600 w-[25%]">{formatScore(user.score)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* STICKY USER RANK FOOTER - FIXED LAYOUT */}
+                        {myRankData && currentUsername !== "Guest" && (
+                            <div className="bg-primary-50 border-t border-primary-100 shrink-0 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] px-2">
+                                <table className="w-full table-fixed">
+                                    <tbody className="text-sm md:text-base">
+                                        <tr className="text-primary-800">
+                                            <td className="px-4 py-3 font-bold w-[15%] text-center">#{myRankData.rank}</td>
+                                            <td className="px-4 py-3 font-bold w-[60%] truncate">You</td>
+                                            <td className="px-4 py-3 text-right font-mono font-bold w-[25%]">{formatScore(myRankData.score)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* REFRESH BUTTON - SEPARATED & FULL WIDTH */}
+                    <button onClick={handleRefresh} disabled={refreshStatus !== 'idle'} className={btnClass}>
+                        {btnContent}
+                    </button>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [user, setUser] = useState(null); 
+            const [isAuthModalOpen, setIsAuthModalOpen] = useState(true); 
+            const [view, setView] = useState('quiz'); 
+            const [score, setScore] = useState(0);
+            
+            const [currentQuestion, setCurrentQuestion] = useState(null);
+
+            useEffect(() => {
+                if (user) setScore(user.score);
+                else setScore(0);
+            }, [user]);
+
+            useEffect(() => {
+                generateNewQuestion();
+            }, []);
+
+            const generateNewQuestion = () => {
+                const nextVocabs = [
+                    { v: "Serendipity", c: ["Kebetulan indah", "Bencana", "Kesedihan", "Rencana", "Takdir"], a: "Kebetulan indah"},
+                    { v: "Luminous", c: ["Gelap", "Bercahaya", "Keras", "Lembut", "Pudar"], a: "Bercahaya"},
+                    { v: "Tranquil", c: ["Ribut", "Tenang", "Cepat", "Marah", "Gelisah"], a: "Tenang"},
+                    { v: "Ephemeral", c: ["Abadi", "Sementara", "Kuat", "Bersinar", "Lama"], a: "Sementara"},
+                    { v: "Mellifluous", c: ["Suara Merdu", "Bau Busuk", "Rasa Pahit", "Warna Cerah", "Kasar"], a: "Suara Merdu"}
+                ];
+                const random = nextVocabs[Math.floor(Math.random() * nextVocabs.length)];
+                setCurrentQuestion({ vocab: random.v, choices: random.c, answer: random.a });
+            };
+
+            const handleLoginSuccess = (userData) => { setUser(userData); setIsAuthModalOpen(false); };
+            const handleLogout = () => { setUser(null); setScore(0); setIsAuthModalOpen(true); };
+            const openAuth = () => setIsAuthModalOpen(true);
+            const closeAuth = () => setIsAuthModalOpen(false);
+            const currentUserDisplay = user || { username: "Guest", score: score };
+
+            return (
+                <div className="flex flex-col h-screen overflow-hidden bg-slate-50 relative">
+                    <AuthModal isOpen={isAuthModalOpen} onClose={closeAuth} onLogin={handleLoginSuccess} />
+                    <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+                        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between relative">
+                            {/* Logo - Hide 'Master' text on small mobile screens to prevent overlap */}
+                            <div className="font-bold text-xl text-slate-800 tracking-tight shrink-0 flex items-center gap-1">
+                                <span className="text-primary-600">Vocab</span>
+                                <span className="hidden sm:inline">Master</span>
+                            </div>
+
+                            {/* Center Navigation - Compact on Mobile */}
+                            <div className="flex bg-slate-100 p-1 rounded-xl mx-2 shrink-0">
+                                <button onClick={() => setView('quiz')} className={`flex items-center gap-2 px-4 md:px-6 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all duration-200 ${view === 'quiz' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                                    <IconPlay /> <span className="hidden sm:inline">Play</span>
+                                </button>
+                                <button onClick={() => setView('leaderboard')} className={`flex items-center gap-2 px-4 md:px-6 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all duration-200 ${view === 'leaderboard' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                                    <IconTrophy /> <span className="hidden sm:inline">Rank</span>
+                                </button>
+                            </div>
+
+                            {/* User Controls */}
+                            <div className="flex items-center justify-end shrink-0 min-w-[40px]">
+                                {user ? (
+                                    <div className="flex items-center gap-2">
+                                        <div className="hidden md:flex flex-col items-end mr-2">
+                                            <span className="text-xs font-bold text-slate-900">{user.username}</span>
+                                        </div>
+                                        <button onClick={handleLogout} className="flex items-center gap-2 px-3 py-1.5 border border-red-200 text-red-500 rounded-lg text-xs font-bold hover:bg-red-50 transition-colors" title="Logout">
+                                            <IconLogOut className="w-4 h-4" /> <span className="hidden md:inline">Logout</span>
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button onClick={openAuth} className="flex items-center gap-2 px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold shadow-md hover:bg-primary-700 transition-all">
+                                        <IconLogIn size={14}/> <span className="hidden md:inline">Login</span>
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </nav>
+                    <main className="flex-1 overflow-hidden relative">
+                        {view === 'quiz' && (
+                            <QuizScreen 
+                                score={score} 
+                                setScore={setScore} 
+                                question={currentQuestion} 
+                                setQuestion={setCurrentQuestion}
+                                onNextQuestion={generateNewQuestion}
+                            />
+                        )}
+                        {view === 'leaderboard' && <LeaderboardScreen currentUser={currentUserDisplay} />}
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
+
