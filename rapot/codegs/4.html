@@ -1,0 +1,301 @@
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile("index");
+}
+
+function getStudentByNIS(token, nis){
+  if(!verifyAdmin(token)){return {success: false, message: "anda tidak punya akses untuk ini"}}
+  
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName("data")
+  const students = sh.getDataRange().getValues()
+
+  let row = -1
+  for(let i=2; i<students.length; i++){
+    if(students[i][3] == nis){
+      row = i
+      break
+    }
+  }
+  if(row === -1){return {success: false, message: "coba refresh halaman"}}
+
+  const nilai = {}
+  for (let s = 1; s <= 5; s++) {
+    let stored = students[row].slice((6 + (s - 1) * 5), (6 + s * 5))
+    nilai[s] = stored
+  }
+
+  return nilai
+}
+
+function deleteStudent(token, nisn){
+  if(!verifyAdmin(token)){return {success: false, message: "anda tidak punya akses untuk ini"}}
+  
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName("data")
+  const students = sh.getRange(1, 1, sh.getLastRow(), 3).getValues()
+
+  for(let i=2; i<students.length; i++){
+    if(students[i][0] == nisn){
+      sh.deleteRow(i+1)
+      return {success: true, message: `siswa ${students[i][2]} berhasil dihapus`}
+    }
+  }
+
+  return {success: false, message: "coba refresh halaman"}
+}
+
+function resetStudentGrades(token, nis){
+  if(!verifyAdmin(token)){return {success: false, message: "anda tidak punya akses untuk ini"}}
+
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName("data")
+  const students = sh.getDataRange().getValues()
+
+  const newGrades = [
+    0,0,0,0,0,
+    0,0,0,0,0,
+    0,0,0,0,0,
+    0,0,0,0,0,
+    0,0,0,0,0
+    ]
+  for(let i=2; i<students.length; i++){
+    if(students[i][3] == nis){
+      sh.getRange(i+1, 7, 1, newGrades.length).setValues([newGrades])
+      return {success: true, message: `nilai siswa ${students[i][2]} berhasil direset`}
+    }
+  }
+
+  return {success: false, message: "coba refresh halaman"}
+}
+
+function addStudent(token, nisn, nama, kelas, nis, tgl, email) {
+  if(!verifyAdmin(token)){return {success: false, message: "anda tidak punya akses untuk ini"}}
+
+  const newStudent = [nisn, tgl, nama, nis, kelas, email]
+
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName("data")
+
+  sh.getRange(sh.getLastRow()+1, 1, 1, 6).setValues([newStudent])
+
+  return {success: true, message: `data siswa ${nama} berhasil ditambahkan`}
+}
+function verifyAdmin(token){
+  if(!token){return false}
+  const role = getRole(token)
+  if(role !== "admin"){return false}
+
+  return true
+}
+function getStudentList(token){
+  if(!verifyAdmin(token)){return}
+
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName("data")
+  const datas = sh.getRange(3,1, sh.getLastRow()-2, 6).getValues()
+
+  const mappedData = datas.map(data => {
+    return {
+      nisn: data[0],
+      nama: data[2],
+      nis: data[3],
+      kelas: data[4],
+    }
+  })
+
+  return mappedData
+}
+
+function getDataSiswa(nisn, tgl) {
+  const ss = SpreadsheetApp.getActive();
+  const shData = ss.getSheetByName("data").getDataRange().getValues();
+
+  let siswa = null;
+  let nilai = {};
+  for (let i = 2; i < shData.length; i++) {
+    const tglSheet = Utilities.formatDate(
+      shData[i][1],
+      Session.getScriptTimeZone(),
+      "yyyy-MM-dd"
+    )
+
+    if(!(String(shData[i][0]) === String(nisn) && tglSheet === tgl)){continue}
+
+    siswa = {
+      nisn: shData[i][0],
+      nama: shData[i][2],
+      nis: shData[i][3],
+      kelas: shData[i][4],
+      email: shData[i][5]
+    }
+    
+    for (let j = 6; j < shData[i].length; j++) {
+      if (shData[i][j] === "") shData[i][j] = 0
+    }
+
+    for (let s = 1; s <= 5; s++) {
+      let stored = shData[i].slice((6 + (s - 1) * 5), (6 + s * 5))
+      nilai[s] = stored
+    }
+
+  }
+  if(!siswa){return null}
+  return { siswa, nilai };
+}
+
+function saveData(token, nisn, data) {
+  const role = getRole(token)
+  if(role === "invalid"){return false}
+
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName("data")
+  const values = sh.getDataRange().getValues();
+
+  let targetRow = 0
+  for(let i = 2; i < values.length; i++){
+    if(values[i][0] === nisn){
+      targetRow = i + 1
+      break
+    }
+  }
+
+  sh.getRange(targetRow, 7, data.length, data[0].length).setValues(data);
+
+  return true
+}
+
+function login(username, password, token){
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName("user")
+  const values = sh.getDataRange().getValues();
+
+  if(token){
+    for(let i = 1; i < values.length; i++){
+      if(values[i][2] === token){return {success: true, message: `selamat datang ${values[i][0]}`, role: values[i][1]}}
+    }
+
+    return {success: false, message: "tolong login ulang"}
+  }
+
+  if(!username || !password){return {success: false, message: "tolong isi semua input"}}
+
+  let targetRow = -1
+  for(let i = 1; i < values.length; i++){
+    if(values[i][0] === username){targetRow = i; break}
+  }
+  if(targetRow === -1){return {success: false, message: "user tidak ditemukan"}}
+
+  const hashed = hash(password)
+  if(hashed !== values[targetRow][3]){return {success: false, message: "password salah"}}
+
+  const newToken = Utilities.getUuid()
+  sh.getRange((targetRow + 1), 3, 1, 1).setValues([[newToken]]);
+
+  return {success: true, message: `selamat datang ${values[targetRow][0]}`, token: newToken, role: values[targetRow][1]}
+}
+
+function getRole(token){
+  if(!token){return "invalid"}
+
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName("user")
+  const values = sh.getRange(2,2, sh.getLastRow()-1, 2).getValues()
+
+  for(let i = 0; i < values.length; i++){
+    if(values[i][1] === token){return values[i][0]}
+  }
+
+  return "invalid"
+}
+
+function getUserList(){
+  const ss = SpreadsheetApp.getActive();
+  const userSh = ss.getSheetByName("user")
+  const requestSh = ss.getSheetByName("request")
+  const users = userSh.getRange(2,1, userSh.getLastRow()-1, 2).getValues()
+  const requests = requestSh.getRange(1,1, requestSh.getLastRow(), 2).getValues()
+  users.shift()
+  requests.shift()
+
+  return {users, requests}
+}
+
+function setRequestUser(token, username, isApproved){
+  if(!verifyAdmin(token)){return {ok:false, message:"anda tidak punya akses untuk fitur ini"}}
+
+  const ss = SpreadsheetApp.getActive();
+  const requestSh = ss.getSheetByName("request")
+  const requests = requestSh.getDataRange().getValues()
+
+  let row = -1
+  for(let i=1;i<requests.length;i++){
+    if(requests[i][0] === username){
+      row = i
+      break
+    }
+  }
+  if(row.length === -1){return {ok: false, message:"tolong refresh halaman"}}
+  
+  requestSh.deleteRow(row+1)
+  if(!isApproved){return {ok: true, message:"permintaan berhasil ditolak"}}
+
+  const userSh = ss.getSheetByName("user")
+  userSh.getRange(userSh.getLastRow()+1, 1, 1, 4).setValues([[requests[row][0], requests[row][1], "",requests[row][2]]])
+
+  return {ok: true, message:"permintaan berhasil diterima"}
+}
+
+function removeUser(token, username){
+  
+  if(!verifyAdmin(token)){return {ok:false, message:"anda tidak punya akses untuk fitur ini"}}
+
+  const ss = SpreadsheetApp.getActive();
+  const userSh = ss.getSheetByName("user")
+  const users = userSh.getDataRange().getValues()
+
+  let targetRow = -1
+  for(let i=1;i<users.length;i++){
+    if(users[i][0] === username){
+      targetRow = i
+      break
+    }
+  }
+  if(targetRow === -1){return {ok:false, message:"tolong refresh halaman"}}
+
+  userSh.deleteRow(targetRow+1)
+  return {ok:true, message:"berhasil menghapus user"}
+}
+
+function register(username, password, role){
+  if(!username || !password){return {success: false, message: "tolong isi semua input"}}
+  
+  const ss = SpreadsheetApp.getActive();
+  const shUsers = ss.getSheetByName("user")
+  const shRequest = ss.getSheetByName("request")
+  const users = shUsers.getDataRange().getValues()
+  const requests = shRequest.getDataRange().getValues()
+  
+  let duplicateRow = -1
+  for(let i = 0; i < requests.length; i++){
+    if(requests[i][0] === username){duplicateRow = i; break}
+  }
+  for(let i = 0; i < users.length; i++){
+    if(users[i][0] === username){duplicateRow = i; break}
+  }
+  if(duplicateRow !== -1){return {success: false, message: "username sudah digunakan"}}
+
+  const hashed = hash(password)
+  shRequest.getRange(shRequest.getLastRow()+1, 1, 1, 3).setValues([[username, role, hashed]]);
+
+  return {success: true, message: "berhasil mengirimkan permintaan"}
+}
+
+function hash(text) {
+  const hashed = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    text,
+    Utilities.Charset.UTF_8
+  ).map(b => ('0' + (b & 0xff).toString(16)).slice(-2)).join('');
+
+  return hashed
+}
