@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <!-- Menggunakan Tailwind CSS v3 (Stabil) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          animation: {
+            marquee: 'marquee 25s linear infinite',
+            'fade-in': 'fadeIn 0.3s ease-out forwards',
+          },
+          keyframes: {
+            marquee: {
+              '0%': { transform: 'translateX(100%)' },
+              '100%': { transform: 'translateX(-100%)' },
+            },
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar untuk Tabel */
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    
+    /* Glass Effect */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    /* Hide Number Input Arrows */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    /* Skeleton Loading Class */
+    .skeleton {
+      background: #e2e8f0;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 0.25rem;
+    }
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Tab Active State */
+    .tab-active {
+      background-color: #2563eb; /* blue-600 */
+      color: white;
+      border-color: #2563eb;
+    }
+    .tab-inactive {
+      background-color: white;
+      color: #64748b; /* slate-500 */
+      border-color: #e2e8f0; /* slate-200 */
+    }
+    .tab-inactive:hover {
+      background-color: #f8fafc; /* slate-50 */
+      color: #334155; /* slate-700 */
+    }
+  </style>
+  <title>Cari Data Siswa</title>
+</head>
+<body class="h-screen flex flex-col bg-gradient-to-br from-slate-100 to-blue-100 font-sans text-slate-800 overflow-hidden relative">
+
+  <!-- Background Decoration -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-200 blur-3xl opacity-30"></div>
+    <div class="absolute bottom-[10%] right-[10%] w-[40%] h-[40%] rounded-full bg-indigo-200 blur-3xl opacity-30"></div>
+  </div>
+
+  <!-- Header Logos -->
+  <div class="absolute top-0 left-0 w-full p-4 sm:p-6 flex justify-between items-start pointer-events-none z-10">
+    <img class="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-md transition-transform hover:scale-105 pointer-events-auto" src="https://upload.wikimedia.org/wikipedia/commons/b/bd/Coat_of_arms_of_Central_Java.svg" alt="Logo Jawa Tengah"/>
+    <img class="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-md transition-transform hover:scale-105 pointer-events-auto" src="https://lh3.googleusercontent.com/d/1B5s362za0ESv2fYHpleiqDoxvw2MPSvR" alt="Logo Sekolah">
+  </div>
+
+  <!-- Logout Button (Authenticated User) -->
+  <button id="logout-btn" onclick="logout()" type="button" class="hidden absolute top-4 right-20 sm:top-6 sm:right-32 z-50 bg-white/80 hover:bg-red-50 text-red-600 border border-red-100 shadow-sm hover:shadow-md px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 flex items-center gap-2 backdrop-blur-sm cursor-pointer">
+    <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">Logout</span>
+  </button>
+
+  <!-- Login Button (Student Mode) -->
+  <button id="login-mode-btn" onclick="backToLogin()" type="button" class="hidden absolute top-4 right-20 sm:top-6 sm:right-32 z-50 bg-white/80 hover:bg-blue-50 text-blue-600 border border-blue-100 shadow-sm hover:shadow-md px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 flex items-center gap-2 backdrop-blur-sm cursor-pointer">
+    <i class="fa-solid fa-user-lock"></i> <span class="hidden sm:inline">Login Guru</span>
+  </button>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-center items-center relative z-20 overflow-hidden py-16">
+    
+    <!-- AUTHENTICATION SECTION -->
+    <section id="authentication-section" class="w-full max-w-sm overflow-y-auto max-h-full p-1 custom-scrollbar">
+      <!-- Login Form -->
+      <form id="login-form" class="hidden glass-panel rounded-2xl shadow-xl p-8 space-y-6 animate-fade-in border-t-4 border-blue-600">
+        <div class="text-center space-y-2">
+          <h2 class="text-2xl font-bold text-slate-800">Selamat Datang</h2>
+          <p class="text-slate-500 text-sm">Silakan login untuk melanjutkan</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-regular fa-user"></i></span>
+              <input maxlength="15" type="text" name="username" required placeholder="Masukkan username" pattern="^[a-zA-Z0-9_-]{1,15}$" title="Maksimal 15 karakter, hanya huruf, angka, - dan _"
+                class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all bg-white/50" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-lock"></i></span>
+              <input maxlength="255" type="password" name="password" required placeholder="••••••••"
+                class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all bg-white/50" />
+            </div>
+          </div>
+        </div>
+
+        <button id="submit-btn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow-lg shadow-blue-500/30 transition-all transform active:scale-95 flex justify-center items-center gap-2">
+          <span>Masuk</span> <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <div class="text-center text-sm text-slate-600 space-y-2">
+          <p>Belum punya akun? <span onclick="switchToSignUp(true)" class="text-blue-600 hover:text-blue-800 font-semibold cursor-pointer transition-colors">Daftar disini</span></p>
+          <div class="flex items-center gap-2 justify-center opacity-75">
+            <span class="h-px w-8 bg-slate-300"></span>
+            <span class="text-xs text-slate-400">ATAU</span>
+            <span class="h-px w-8 bg-slate-300"></span>
+          </div>
+          <p onclick="skipAuth()" class="text-slate-500 hover:text-blue-600 cursor-pointer transition-colors inline-flex items-center gap-1">
+            Masuk sebagai <span class="font-semibold underline">Siswa</span>
+          </p>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="hidden glass-panel rounded-2xl shadow-xl p-8 space-y-6 animate-fade-in border-t-4 border-indigo-600">
+        <div class="text-center space-y-2">
+          <h2 class="text-2xl font-bold text-slate-800">Buat Akun Baru</h2>
+          <p class="text-slate-500 text-sm">Ajukan permohonan pendaftaran</p>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+            <input maxlength="15" type="text" name="username" required pattern="^[a-zA-Z0-9_-]{1,15}$" title="Maksimal 15 karakter, hanya huruf, angka, - dan _"
+              class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-white/50"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+            <input maxlength="255" type="password" name="password" required
+              class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-white/50"/>
+          </div>
+          <!-- Role Selection Added -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Daftar Sebagai</label>
+            <div class="relative">
+              <select name="role" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-white/50 appearance-none cursor-pointer">
+                <option value="guru">Guru</option>
+                <option value="admin">Admin</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                <i class="fa-solid fa-chevron-down text-xs"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button id="submit-btn" type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg shadow-lg shadow-indigo-500/30 transition-all transform active:scale-95">
+          Ajukan Permintaan
+        </button>
+        
+        <p class="text-center text-sm text-slate-600">
+          Sudah punya akun? <span onclick="switchToSignUp(false)" class="text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer">Login disini</span>
+        </p>
+      </form>
+    </section>
+
+    <!-- ADMIN SECTION -->
+    <section id="admin-section" class="hidden w-full h-full flex flex-col pt-4 pb-12">
+      <!-- Admin Header & Tabs -->
+      <div class="text-center mb-4 shrink-0 animate-fade-in">
+        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Admin Dashboard</h1>
+        <div class="h-1 w-20 bg-blue-500 mx-auto mt-1 rounded-full mb-4"></div>
+        
+        <!-- Tab Buttons -->
+        <div class="flex flex-wrap justify-center gap-2 mb-2">
+          <button onclick="switchAdminTab('users')" id="tab-btn-users" class="px-4 py-2 rounded-full text-sm font-semibold border transition-all shadow-sm tab-active">
+            <i class="fa-solid fa-users-gear mr-2"></i>User
+          </button>
+          <button onclick="switchAdminTab('students')" id="tab-btn-students" class="px-4 py-2 rounded-full text-sm font-semibold border transition-all shadow-sm tab-inactive">
+            <i class="fa-solid fa-graduation-cap mr-2"></i>Data Siswa
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: USER MANAGEMENT -->
+      <div id="admin-tab-users" class="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full min-h-0">
+        <!-- Registered Users -->
+        <div id="registered-user-container" class="glass-panel rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col h-full">
+          <div class="bg-slate-50 border-b border-slate-200 p-3 shrink-0">
+            <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+              <i class="fa-solid fa-users text-blue-500"></i> User Terdaftar
+            </h2>
+          </div>
+          <div class="p-3 flex-1 overflow-y-auto custom-scrollbar">
+            <ul id="registered-user-list" class="space-y-2">
+              <li class="grid grid-cols-12 gap-2 bg-slate-800 text-white text-xs font-semibold uppercase tracking-wider py-2 px-3 rounded-lg mb-2 sticky top-0 z-10 shadow-sm">
+                <span class="col-span-1 text-center">No</span>
+                <span class="col-span-5">Username</span> <!-- Adjusted Col Span -->
+                <span class="col-span-3 text-center">Role</span> <!-- New Role Header -->
+                <span class="col-span-3 text-center">Aksi</span>
+              </li>
+              <div id="no-registered-user" class="hidden flex flex-col items-center justify-center py-12 text-slate-400">
+                <i class="fa-regular fa-folder-open text-3xl mb-2"></i>
+                <p>Tidak ada data</p>
+              </div>
+            </ul>
+          </div>
+        </div>
+
+        <!-- User Requests -->
+        <div id="request-user-container" class="glass-panel rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col h-full">
+          <div class="bg-slate-50 border-b border-slate-200 p-3 shrink-0">
+            <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+              <i class="fa-solid fa-user-clock text-amber-500"></i> Permintaan Masuk
+            </h2>
+          </div>
+          <div class="p-3 flex-1 overflow-y-auto custom-scrollbar">
+            <ul id="request-user-list" class="space-y-2">
+              <li class="grid grid-cols-12 gap-2 bg-slate-800 text-white text-xs font-semibold uppercase tracking-wider py-2 px-3 rounded-lg mb-2 sticky top-0 z-10 shadow-sm">
+                <span class="col-span-1 text-center">No</span>
+                <span class="col-span-5">Username</span> <!-- Adjusted Col Span -->
+                <span class="col-span-3 text-center">Req Role</span> <!-- New Role Header -->
+                <span class="col-span-3 text-center">Opsi & Aksi</span>
+              </li>
+              <div id="no-user-request" class="hidden flex flex-col items-center justify-center py-12 text-slate-400">
+                <i class="fa-regular fa-circle-check text-3xl mb-2"></i>
+                <p>Tidak ada permintaan</p>
+              </div>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: STUDENT MANAGEMENT -->
+      <div id="admin-tab-students" class="hidden flex-col h-full min-h-0 items-center w-full">
+        <!-- Center container with mx-auto -->
+        <div class="glass-panel rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col h-full w-full max-w-4xl mx-auto">
+          <!-- Header with Add Button -->
+          <div class="bg-emerald-50 border-b border-emerald-200 p-3 shrink-0 flex justify-between items-center">
+            <h2 class="text-base font-semibold text-emerald-800 flex items-center gap-2">
+              <i class="fa-solid fa-list-ul"></i> Daftar Siswa
+            </h2>
+            <button onclick="openAddStudentModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium shadow-sm transition-colors flex items-center gap-2">
+              <i class="fa-solid fa-plus"></i> Tambah Siswa Baru
+            </button>
+          </div>
+
+          <!-- Table Container -->
+          <div class="flex-1 overflow-auto custom-scrollbar relative bg-white">
+            <table class="w-full text-xs text-left whitespace-nowrap min-w-[600px]">
+              <thead class="bg-slate-800 text-white uppercase text-[10px] font-semibold tracking-wider sticky top-0 z-10 shadow-sm">
+                <tr>
+                  <th class="p-3 text-center w-10">No</th>
+                  <th class="p-3 text-center">NIS</th> 
+                  <th class="p-3">NISN</th>
+                  <th class="p-3">Nama Siswa</th>
+                  <th class="p-3 text-center">Kelas</th>
+                  <th class="p-3 text-center w-24">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="student-list-body" class="divide-y divide-slate-100 text-slate-700 font-medium">
+                <!-- Data will be injected here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SEARCH FORM (SISWA) -->
+    <form id="search-form" class="hidden glass-panel rounded-2xl shadow-xl p-6 sm:p-10 w-full max-w-lg space-y-6 animate-fade-in border-t-4 border-emerald-500 my-auto">
+      <div class="text-center">
+        <h3 class="text-2xl font-bold text-slate-800">Cari Data Siswa</h3>
+        <p class="text-slate-500 text-sm mt-1">Masukkan NISN dan Tanggal Lahir</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label for="nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN</label>
+          <input maxlength="10" id="nisn" required pattern="\d{10}" title="NISN harus 10 digit angka" placeholder="Nomor Induk Siswa Nasional"
+            class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all bg-white/50 text-slate-800 tracking-wide"/>
+        </div>
+
+        <div>
+          <label for="tgl" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Lahir</label>
+          <input type="date" id="tgl" required
+            class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all bg-white/50 text-slate-800"/>
+        </div>
+      </div>
+
+      <input id="search-btn" type="submit" value="Cari Siswa"
+        class="w-full py-3 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 shadow-lg shadow-emerald-500/30 cursor-pointer transition-all transform active:scale-95"/>
+    </form>
+
+    <!-- DATA RESULT SECTION -->
+    <section id="data-section" class="hidden glass-panel rounded-2xl shadow-xl w-full max-w-5xl h-full max-h-[calc(100vh-80px)] flex flex-col p-4 sm:p-5 animate-fade-in relative z-20">
+      
+      <!-- Header Section -->
+      <div class="flex justify-between items-center mb-3 shrink-0">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-800 border-l-4 border-blue-500 pl-3">Hasil Pencarian</h3>
+        <button onclick="backToSearch()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-full text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-left"></i> Kembali
+        </button>
+      </div>
+      
+      <!-- Student Info Grid -->
+      <div class="bg-white/60 rounded-xl p-3 mb-3 grid grid-cols-2 md:grid-cols-3 gap-2 text-xs sm:text-sm border border-slate-100 shadow-sm shrink-0">
+        <div class="flex flex-col"><span class="text-[10px] text-slate-500 uppercase tracking-wider">Nama</span><span id="nama" class="font-semibold text-slate-800 truncate min-h-[1.5em]"></span></div>
+        <div class="flex flex-col"><span class="text-[10px] text-slate-500 uppercase tracking-wider">NISN</span><span id="nisn2" class="font-mono font-medium text-slate-700 min-h-[1.5em]"></span></div>
+        <div class="flex flex-col"><span class="text-[10px] text-slate-500 uppercase tracking-wider">Kelas</span><span id="kelas" class="font-medium text-slate-700 min-h-[1.5em]"></span></div>
+        <div class="flex flex-col"><span class="text-[10px] text-slate-500 uppercase tracking-wider">NIS</span><span id="nis" class="font-mono font-medium text-slate-700 min-h-[1.5em]"></span></div>
+        <div class="flex flex-col md:col-span-2"><span class="text-[10px] text-slate-500 uppercase tracking-wider">Email</span><span id="email" class="font-medium text-slate-700 truncate min-h-[1.5em]"></span></div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="flex-1 overflow-auto custom-scrollbar rounded-lg border border-slate-200 shadow-sm bg-white min-h-0 relative">
+        <table class="w-full text-xs text-left min-w-[600px] relative">
+          <thead class="bg-slate-800 text-white uppercase text-[10px] font-semibold tracking-wider sticky top-0 z-10 shadow-sm">
+            <tr>
+              <th class="p-2 text-center w-12">Smt</th>
+              <th class="p-2 text-center">B. Indo</th>
+              <th class="p-2 text-center">B. Ing</th>
+              <th class="p-2 text-center">Mat</th>
+              <th class="p-2 text-center">IPA</th>
+              <th class="p-2 text-center">Inf</th>
+              <th class="p-2 text-center w-16 bg-slate-900">Rata²</th>
+            </tr>
+          </thead>
+          <tbody id="tbl" class="divide-y divide-slate-100">
+            <!-- rows generated via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer Section -->
+      <div class="mt-3 flex flex-col gap-2 shrink-0">
+        <div id="status" class="py-2 px-3 rounded-lg bg-blue-50 border border-blue-100 text-center font-semibold text-blue-800 text-xs sm:text-sm transition-all min-h-[2.5em]">
+          Menunggu perhitungan...
+        </div>
+
+        <button id="save-btn" onclick="save()"
+          class="w-full py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 shadow-md shadow-blue-500/30 cursor-pointer transition-all transform active:scale-[0.98] flex justify-center items-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer (Fixed Bottom) -->
+  <footer class="fixed bottom-0 w-full z-50 bg-blue-600/90 backdrop-blur-md text-white py-1.5 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+    <div class="overflow-hidden relative w-full flex items-center h-5">
+      <div class="animate-marquee whitespace-nowrap absolute">
+        <span class="mx-4 text-xs font-medium tracking-wide">Aplikasi ini dibuat oleh Arkana Faisal Ridho kelas 12F-7 Absen 3 @2026</span>
+        <span class="mx-4 text-xs font-medium tracking-wide opacity-50">|</span>
+        <span class="mx-4 text-xs font-medium tracking-wide">Gunakan dengan bijak</span>
+        <span class="mx-4 text-xs font-medium tracking-wide opacity-50">|</span>
+        <span class="mx-4 text-xs font-medium tracking-wide">Aplikasi ini dibuat oleh Arkana Faisal Ridho kelas 12F-7 Absen 3 @2026</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="alertBox" class="fixed top-6 left-1/2 -translate-x-1/2 z-[200] hidden min-w-[300px] max-w-md rounded-xl px-6 py-4 shadow-2xl transition-all duration-300 flex items-center gap-3 border border-white/20 backdrop-blur-md">
+    <i id="alertIcon" class="text-xl"></i>
+    <span id="alertMsg" class="font-medium text-sm"></span>
+  </div>
+
+  <!-- Confirmation Modal (Universal) -->
+  <div id="confirmModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in">
+    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full border border-slate-200">
+      <div class="text-center mb-6">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-slate-100 mb-4 text-slate-600" id="confirm-icon-container">
+          <i class="fa-solid fa-triangle-exclamation text-xl" id="confirm-icon"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900" id="confirm-title">Konfirmasi</h3>
+        <p class="text-sm text-slate-500 mt-2" id="confirm-desc">Apakah Anda yakin?</p>
+      </div>
+      <div class="flex gap-3 justify-center">
+        <button onclick="closeConfirm()" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors">
+          Batal
+        </button>
+        <button id="confirmBtn" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-md shadow-blue-500/30 transition-colors">
+          Ya
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Student Modal (New) -->
+  <div id="addStudentModal" class="hidden fixed inset-0 z-[150] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="bg-blue-600 px-6 py-4 flex justify-between items-center shrink-0">
+        <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-user-plus mr-2"></i>Tambah Siswa Baru</h3>
+        <button onclick="closeAddStudentModal()" class="text-white hover:text-blue-200 transition-colors">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto custom-scrollbar">
+        <form id="add-student-form" class="space-y-4" onsubmit="handleAddStudent(event)">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">NISN (10 Digit Angka)</label>
+            <input type="text" name="nisn" required pattern="\d{10}" maxlength="10" inputmode="numeric" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="1234567890" title="NISN harus 10 digit angka">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Lengkap</label>
+            <input type="text" name="nama" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Nama Siswa">
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kelas</label>
+              <div class="relative">
+                <select name="kelas" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all appearance-none cursor-pointer">
+                  <option value="" disabled selected>Pilih</option>
+                  <!-- Populated via JS -->
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                  <i class="fa-solid fa-chevron-down text-xs"></i>
+                </div>
+              </div>
+            </div>
+             <div>
+              <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">NIS (5 Digit Angka)</label>
+              <input type="text" name="nis" required pattern="\d{5}" maxlength="5" inputmode="numeric" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="12345" title="NIS harus 5 digit angka">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tanggal Lahir</label>
+            <input type="date" name="tgl" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email</label>
+            <input type="email" name="email" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="email@sekolah.sch.id">
+          </div>
+          <div class="pt-2">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow-md transition-all active:scale-95">
+              Simpan Data
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Student Modal (New - merged from view tab) -->
+  <div id="viewStudentModal" class="hidden fixed inset-0 z-[160] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center shrink-0">
+        <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-graduation-cap mr-2"></i>Detail Data Siswa</h3>
+        <button onclick="closeViewStudentModal()" class="text-white hover:text-indigo-200 transition-colors">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto custom-scrollbar flex flex-col">
+        <!-- Info Card -->
+        <div class="bg-indigo-50 rounded-lg p-4 mb-4 border border-indigo-100 shrink-0">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <span class="text-xs text-indigo-600 uppercase font-bold block mb-1">Nama Siswa</span>
+              <span id="modal-view-nama" class="text-lg font-bold text-slate-800 skeleton h-6 w-32 block rounded"></span>
+            </div>
+            <div>
+              <span class="text-xs text-indigo-600 uppercase font-bold block mb-1">NISN</span>
+              <span id="modal-view-nisn" class="font-mono text-slate-700 font-medium skeleton h-6 w-24 block rounded"></span>
+            </div>
+            <div>
+              <span class="text-xs text-indigo-600 uppercase font-bold block mb-1">Kelas</span>
+              <span id="modal-view-kelas" class="text-slate-700 skeleton h-6 w-16 block rounded"></span>
+            </div>
+            <div>
+              <span class="text-xs text-indigo-600 uppercase font-bold block mb-1">NIS</span>
+              <span id="modal-view-nis" class="font-mono text-slate-700 skeleton h-6 w-16 block rounded"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grades Table -->
+        <h4 class="text-sm font-bold text-slate-700 mb-2">Riwayat Nilai</h4>
+        <div class="border rounded-lg border-slate-200 overflow-hidden">
+          <table class="w-full text-xs text-center">
+            <thead class="bg-slate-800 text-white">
+              <tr>
+                <th class="p-2">Semester</th>
+                <th class="p-2">B. Indo</th>
+                <th class="p-2">B. Ing</th>
+                <th class="p-2">Mat</th>
+                <th class="p-2">IPA</th>
+                <th class="p-2">Inf</th>
+              </tr>
+            </thead>
+            <tbody id="modal-view-table-body" class="divide-y divide-slate-100 bg-white">
+              <!-- Loading Skeletons -->
+              <tr><td colspan="6" class="p-4 text-center italic text-slate-400">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <template id="registered-user-node-template">
+    <li id="registered-user-node" class="grid grid-cols-12 gap-2 bg-white hover:bg-slate-50 border-b border-slate-100 py-3 px-3 rounded-lg items-center transition-colors text-sm">
+      <h4 class="col-span-1 text-center font-mono text-slate-500 no-col">1</h4>
+      <h4 class="col-span-5 truncate font-mono text-slate-700 px-2 tracking-tight username-col">username</h4>
+      <h4 class="col-span-3 text-center role-col"></h4>
+      <h4 class="col-span-3 flex justify-center">
+        <button onclick="confirmDeleteUser(this)" class="bg-red-100 hover:bg-red-200 text-red-600 rounded-lg p-1.5 transition-colors" title="Hapus User">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </h4>
+    </li>
+  </template>
+
+  <template id="request-user-node-template">
+    <li id="request-user-node" class="grid grid-cols-12 gap-2 bg-white hover:bg-slate-50 border-b border-slate-100 py-2 px-3 rounded-lg items-center transition-colors text-sm">
+      <h4 class="col-span-1 text-center font-mono text-slate-500 no-col">1</h4>
+      <h4 class="col-span-6 truncate font-mono text-slate-700 px-2 tracking-tight username-col">username</h4>
+      <h4 class="col-span-2 text-center req-role-col"></h4>
+      <h4 class="col-span-3 flex justify-center gap-2 items-center">
+        <button onclick="requestUserHandler(this, true)" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-600 rounded-lg p-1.5 transition-colors" title="Terima">
+          <i class="fa-solid fa-check"></i>
+        </button>
+        <button onclick="requestUserHandler(this, false)" class="bg-red-100 hover:bg-red-200 text-red-600 rounded-lg p-1.5 transition-colors" title="Tolak">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </h4>
+    </li>
+  </template>
+
+  <!-- Modified Student Row Template (Added 3 Buttons: View, Reset, Delete) -->
+  <template id="student-row-template">
+    <tr class="hover:bg-emerald-50 transition-colors group">
+      <td class="p-3 text-center border-r border-slate-100 font-mono text-slate-400 no-col">1</td>
+      <td class="p-3 font-mono text-center text-slate-600 nis-col"></td>
+      <td class="p-3 font-mono font-medium text-slate-800 nisn-col"></td>
+      <td class="p-3 font-semibold name-col"></td>
+      <td class="p-3 text-center class-col"></td>
+      <td class="p-3 text-center sticky right-0 bg-white group-hover:bg-emerald-50 shadow-[-5px_0_10px_-5px_rgba(0,0,0,0.1)] flex justify-center gap-1.5">
+        <!-- View Detail -->
+        <button onclick="openViewStudentModal(this)" class="bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg p-1.5 transition-colors text-xs shadow-sm" title="Lihat Detail">
+          <i class="fa-solid fa-eye"></i>
+        </button>
+        <!-- Reset Grades (Eraser) -->
+        <button onclick="confirmResetStudent(this)" class="bg-orange-100 hover:bg-orange-200 text-orange-600 rounded-lg p-1.5 transition-colors text-xs shadow-sm" title="Reset Nilai">
+          <i class="fa-solid fa-eraser"></i>
+        </button>
+        <!-- Delete Student (Trash) -->
+        <button onclick="confirmDeleteStudent(this)" class="bg-red-100 hover:bg-red-200 text-red-600 rounded-lg p-1.5 transition-colors text-xs shadow-sm" title="Hapus Siswa">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </td>
+    </tr>
+  </template>
+
+  <template id="row-template">
+    <tr class="hover:bg-blue-50/50 transition-colors group">
+      <td class="p-1.5 text-center border-r border-slate-100 font-semibold text-slate-600 semester bg-slate-50/50"></td>
+      <td class="p-1"><input class="w-full text-center p-1.5 rounded focus:bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none bg-transparent transition-all font-medium text-slate-700 placeholder-slate-300 text-xs" type="number" placeholder="0" /></td>
+      <td class="p-1"><input class="w-full text-center p-1.5 rounded focus:bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none bg-transparent transition-all font-medium text-slate-700 placeholder-slate-300 text-xs" type="number" placeholder="0" /></td>
+      <td class="p-1"><input class="w-full text-center p-1.5 rounded focus:bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none bg-transparent transition-all font-medium text-slate-700 placeholder-slate-300 text-xs" type="number" placeholder="0" /></td>
+      <td class="p-1"><input class="w-full text-center p-1.5 rounded focus:bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none bg-transparent transition-all font-medium text-slate-700 placeholder-slate-300 text-xs" type="number" placeholder="0" /></td>
+      <td class="p-1"><input class="w-full text-center p-1.5 rounded focus:bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none bg-transparent transition-all font-medium text-slate-700 placeholder-slate-300 text-xs" type="number" placeholder="0" /></td>
+      <td class="p-1.5 text-center font-bold text-blue-600 avg bg-slate-50/30"></td>
+    </tr>
+  </template>
+
+  <!-- Skeleton Templates -->
+  <template id="skeleton-row-admin">
+    <li class="grid grid-cols-12 gap-2 bg-white border-b border-slate-100 py-3 px-3 rounded-lg items-center">
+        <div class="col-span-1 skeleton h-4 w-4 mx-auto rounded"></div>
+        <div class="col-span-7 skeleton h-4 w-24 rounded"></div>
+        <div class="col-span-4 flex justify-center gap-2">
+            <div class="skeleton h-6 w-6 rounded"></div>
+            <div class="skeleton h-6 w-6 rounded"></div>
+        </div>
+    </li>
+  </template>
+
+  <template id="skeleton-row-table">
+    <tr class="border-b border-slate-50">
+      <td class="p-2"><div class="skeleton h-6 w-full rounded"></div></td>
+      <td class="p-2"><div class="skeleton h-8 w-full rounded"></div></td>
+      <td class="p-2"><div class="skeleton h-8 w-full rounded"></div></td>
+      <td class="p-2"><div class="skeleton h-8 w-full rounded"></div></td>
+      <td class="p-2"><div class="skeleton h-8 w-full rounded"></div></td>
+      <td class="p-2"><div class="skeleton h-8 w-full rounded"></div></td>
+      <td class="p-2"><div class="skeleton h-8 w-full rounded"></div></td>
+    </tr>
+  </template>
+
+  <!-- Skeleton for Student List (Admin) -->
+  <template id="skeleton-row-student-list">
+    <tr class="border-b border-slate-50">
+      <td class="p-3"><div class="skeleton h-4 w-6 mx-auto rounded"></div></td>
+      <td class="p-3"><div class="skeleton h-4 w-12 mx-auto rounded"></div></td>
+      <td class="p-3"><div class="skeleton h-4 w-20 rounded"></div></td>
+      <td class="p-3"><div class="skeleton h-4 w-32 rounded"></div></td>
+      <td class="p-3"><div class="skeleton h-4 w-10 mx-auto rounded"></div></td>
+      <td class="p-3 text-center flex justify-center gap-2">
+        <div class="skeleton h-6 w-6 rounded"></div>
+        <div class="skeleton h-6 w-6 rounded"></div>
+        <div class="skeleton h-6 w-6 rounded"></div>
+      </td>
+    </tr>
+  </template>
+
+<script>
+/**
+ * DOKUMENTASI API BACKEND (CODE.GS)
+ * * * 1. login(username, password, token)
+ * - Input: string, string, string (opsional)
+ * - Output: { success: boolean, message: string, token: string, role: "admin"|"user" }
+ * * * 2. register(username, password, role)
+ * - Input: string, string, string ("guru" | "admin")
+ * - Output: { ok: boolean, message: string }
+ * * * 3. getUserList()
+ * - Input: -
+ * - Output: { users: [[username, role]], requests: [[username, role]] }
+ * * * 4. setRequestUser(token, username, isApproved)
+ * - Input: string, string, boolean
+ * - Output: { ok: boolean, message: string }
+ * * * 5. removeUser(token, username)
+ * - Input: string, string
+ * - Output: { ok: boolean, message: string }
+ * * * 6. getDataSiswa(nisn, tgl)
+ * - Input: string, string (format YYYY-MM-DD)
+ * - Output: { 
+ * siswa: { nama: string, nisn: string, nis: string, kelas: string, email: string },
+ * nilai: { 1: [n1, n2, n3, n4, n5], ... 5: [...] } // Index 1-5 semester
+ * } | null (jika tidak ketemu)
+ * * * 7. saveData(token, nisn, dataNilai)
+ * - Input: string, string, array[][]
+ * - Output: boolean (true jika sukses)
+ * * * --- ADMIN FITUR BARU ---
+ * * * 8. getStudentList(token)
+ * - Input: string
+ * - Output: Array of Objects [
+ * { nisn: string, nama: string, kelas: string, nis: string }, ...
+ * ] (Email dihapus dari output)
+ * * * 9. addStudent(token, nisn, nama, kelas, nis, tgl, email)
+ * - Input: string, string, string, string, string, string, string
+ * - Output: { success: boolean, message: string }
+ * * * 10. resetStudentGrades(token, nis)
+ * - Input: string, string (NIS)
+ * - Output: { success: boolean, message: string }
+ * * * 11. deleteStudent(token, nisn)
+ * - Input: string, string (NISN)
+ * - Output: { success: boolean, message: string }
+ * * * 12. getStudentByNIS(token, nis)
+ * - Input: string, string
+ * - Output: { 1: [n1, n2, n3, n4, n5], ... } // Hanya object nilai
+ */
+
+//variable
+const loginForm = document.getElementById("login-form")
+const submitLoginForm = loginForm.querySelector("#submit-btn")
+const registerForm = document.getElementById("register-form")
+const submitRegisterForm = registerForm.querySelector("#submit-btn")
+const searchForm = document.getElementById("search-form")
+const adminSection = document.getElementById("admin-section")
+const dataSection = document.getElementById("data-section")
+let currentNISN = "";
+const searchBtn = searchForm.querySelector("#search-btn")
+const logoutBtn = document.getElementById("logout-btn")
+const loginModeBtn = document.getElementById("login-mode-btn") 
+
+// Populate Class Dropdown on Load
+function populateClassDropdown() {
+  const select = document.querySelector('select[name="kelas"]');
+  if(!select) return;
+  
+  const grades = ['10', '11', '12'];
+  grades.forEach(grade => {
+    const group = document.createElement('optgroup');
+    group.label = `Kelas ${grade}`;
+    // Determine letter based on grade
+    let letter = '';
+    if (grade === '10') {
+      letter = 'E';
+    } else {
+      letter = 'F'; // For 11 and 12
+    }
+
+    for(let i=1; i<=11; i++) {
+      const option = document.createElement('option');
+      // Format: Grade Letter-Index (e.g., 10 E-1, 11 F-1)
+      const className = `${grade} ${letter}-${i}`;
+      option.value = className;
+      option.textContent = className;
+      group.appendChild(option);
+    }
+    select.appendChild(group);
+  });
+}
+document.addEventListener('DOMContentLoaded', populateClassDropdown);
+
+// authorization logic
+checkSession()
+function checkSession(){
+  const token = localStorage.getItem("token")
+  if(!token){return loginForm.classList.remove("hidden")}
+
+  google.script.run.withSuccessHandler(res =>{
+    if(!res.success){
+      loginForm.classList.remove("hidden")
+      showAlert(res.message, "warning")
+      return
+    }
+
+    loginForm.classList.add("hidden")
+    logoutBtn.classList.remove("hidden")
+    showAlert(res.message, "info")
+
+    if(res.role === "admin"){
+      adminSection.classList.remove("hidden")
+      setAdminSection()
+      fetchStudentList() // Fetch real data
+      return
+    }
+
+    searchForm.classList.remove("hidden")
+  
+  }).login(null, null, token)
+}
+
+loginForm.addEventListener("submit", e => {
+  e.preventDefault()
+  setSubmitDisabled(submitLoginForm, true, "Masuk")
+
+  const username = loginForm.elements.username.value.trim()
+  const password = loginForm.elements.password.value.trim()
+
+  google.script.run.withSuccessHandler(res =>{
+    setSubmitDisabled(submitLoginForm, false, "Masuk")
+    if(!res.success){return showAlert(res.message, "warning")}
+
+    localStorage.setItem("token", res.token)
+    loginForm.reset()
+    loginForm.classList.add("hidden")
+    logoutBtn.classList.remove("hidden")
+    showAlert(res.message, "info")
+    if(res.role === "admin"){
+      adminSection.classList.remove("hidden")
+      setAdminSection()
+      fetchStudentList()
+      return
+    }
+
+    searchForm.classList.remove("hidden")
+  }).withFailureHandler(err => {
+    setSubmitDisabled(submitLoginForm, false, "Masuk")
+    showAlert("server error", "error")
+  }).login(username, password)
+})
+
+registerForm.addEventListener("submit", e =>{
+  e.preventDefault()
+  setSubmitDisabled(submitRegisterForm, true, "Ajukan Permintaan")
+
+  const username = registerForm.elements.username.value.trim()
+  const password = registerForm.elements.password.value.trim()
+  const role = registerForm.elements.role.value; // Get selected role
+
+  google.script.run.withSuccessHandler(res =>{
+    setSubmitDisabled(submitRegisterForm, false, "Ajukan Permintaan")
+    if(!res.ok){return showAlert(res.message, "error")}
+
+    showAlert(res.message)
+  }).withFailureHandler(err => {
+    setSubmitDisabled(submitRegisterForm, false, "Ajukan Permintaan")
+    showAlert("server error", "error")
+  }).register(username, password, role) // Pass role to backend
+})
+
+function logout(){
+  localStorage.removeItem("token")
+  logoutBtn.classList.add("hidden")
+  
+  loginForm.classList.remove("hidden")
+  searchForm.classList.add("hidden")
+  dataSection.classList.add("hidden")
+  adminSection.classList.add("hidden")
+  
+  // Reset forms
+  loginForm.reset();
+  searchForm.reset();
+}
+
+function switchToSignUp(isTrue){
+  if(isTrue){
+    loginForm.classList.add("hidden")
+    registerForm.classList.remove("hidden")
+    return
+  }
+  registerForm.classList.add("hidden")
+  loginForm.classList.remove("hidden")
+
+}
+
+function skipAuth(){
+  loginForm.classList.add("hidden")
+  searchForm.classList.remove("hidden")
+  loginModeBtn.classList.remove("hidden")
+}
+
+function backToLogin(){
+    loginModeBtn.classList.add("hidden")
+    searchForm.classList.add("hidden")
+    dataSection.classList.add("hidden")
+    searchForm.reset();
+    loginForm.classList.remove("hidden")
+}
+
+// --- ADMIN TABS LOGIC (Simplified - No Transition) ---
+function switchAdminTab(tabName) {
+    const tabs = ['users', 'students'];
+    
+    tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const content = document.getElementById(`admin-tab-${t}`);
+        
+        if (t === tabName) {
+            btn.classList.replace("tab-inactive", "tab-active");
+            content.classList.remove("hidden");
+        } else {
+            btn.classList.replace("tab-active", "tab-inactive");
+            content.classList.add("hidden");
+        }
+    });
+}
+
+// --- ADMIN STUDENT DATA LOGIC (REAL BACKEND) ---
+
+function fetchStudentList() {
+    const tbody = document.getElementById("student-list-body");
+    
+    // Show skeleton loading for table
+    tbody.innerHTML = "";
+    const skeleton = document.getElementById("skeleton-row-student-list").content;
+    for(let i=0; i<5; i++) {
+      tbody.appendChild(skeleton.cloneNode(true));
+    }
+    
+    const token = localStorage.getItem("token");
+    
+    google.script.run.withSuccessHandler(students => {
+        tbody.innerHTML = "";
+        
+        if (!students || students.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-400">Tidak ada data siswa</td></tr>';
+            return;
+        }
+
+        const template = document.getElementById("student-row-template");
+        students.forEach((student, index) => {
+            const row = template.content.cloneNode(true);
+            row.querySelector(".no-col").textContent = index + 1;
+            row.querySelector(".nisn-col").textContent = student.nisn;
+            row.querySelector(".name-col").textContent = student.nama;
+            row.querySelector(".class-col").textContent = student.kelas;
+            row.querySelector(".nis-col").textContent = student.nis; 
+            
+            // Store Data in dataset for actions
+            const tr = row.querySelector("tr");
+            tr.dataset.nis = student.nis;
+            tr.dataset.nisn = student.nisn;
+            tr.dataset.nama = student.nama;
+            tr.dataset.kelas = student.kelas;
+            
+            tbody.appendChild(row);
+        });
+    }).withFailureHandler(err => {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-400">Gagal memuat data</td></tr>';
+        showAlert("Gagal memuat daftar siswa", "error");
+    }).getStudentList(token);
+}
+
+// Modal Logic for Adding Student
+function openAddStudentModal() {
+    document.getElementById("addStudentModal").classList.remove("hidden");
+}
+
+function closeAddStudentModal() {
+    document.getElementById("addStudentModal").classList.add("hidden");
+}
+
+function handleAddStudent(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector("button[type=submit]");
+    const form = e.target;
+    
+    // JS Validation
+    const nisnVal = form.nisn.value;
+    const nisVal = form.nis.value;
+    
+    if(!/^\d{10}$/.test(nisnVal)) {
+        showAlert("NISN harus terdiri dari 10 digit angka.", "warning");
+        return;
+    }
+    if(!/^\d{5}$/.test(nisVal)) {
+        showAlert("NIS harus terdiri dari 5 digit angka.", "warning");
+        return;
+    }
+
+    setSubmitDisabled(btn, true, "Menyimpan...");
+    
+    // Parameters passed individually
+    const nisn = nisnVal;
+    const nama = form.nama.value;
+    const kelas = form.kelas.value;
+    const nis = nisVal;
+    const tgl = form.tgl.value;
+    const email = form.email.value;
+    
+    const token = localStorage.getItem("token");
+
+    google.script.run.withSuccessHandler(res => {
+        setSubmitDisabled(btn, false, 'Simpan Data');
+        
+        if (res && res.success) {
+            showAlert("Data siswa berhasil ditambahkan", "success");
+            e.target.reset();
+            closeAddStudentModal();
+            fetchStudentList(); // Refresh list
+        } else {
+            showAlert(res ? res.message : "Gagal menyimpan data", "error");
+        }
+    }).withFailureHandler(err => {
+        setSubmitDisabled(btn, false, 'Simpan Data');
+        showAlert("Terjadi kesalahan server", "error");
+    }).addStudent(token, nisn, nama, kelas, nis, tgl, email);
+}
+
+// --- VIEW STUDENT DETAIL LOGIC (REAL BACKEND) ---
+function openViewStudentModal(btn) {
+    const row = btn.closest("tr");
+    const nis = row.dataset.nis;
+    const token = localStorage.getItem("token");
+    
+    // Get info from row dataset directly (Client-side)
+    const nama = row.dataset.nama;
+    const nisn = row.dataset.nisn;
+    const kelas = row.dataset.kelas;
+
+    // Populate modal info immediately
+    document.getElementById("modal-view-nama").textContent = nama;
+    document.getElementById("modal-view-nisn").textContent = nisn;
+    document.getElementById("modal-view-kelas").textContent = kelas;
+    document.getElementById("modal-view-nis").textContent = nis;
+    
+    // Remove skeleton classes for info
+    const els = ["nama", "nisn", "kelas", "nis"];
+    els.forEach(id => {
+        const el = document.getElementById(`modal-view-${id}`);
+        el.classList.remove("skeleton", "h-6", "w-32", "w-24", "w-16", "block", "rounded");
+    });
+
+    const tbody = document.getElementById("modal-view-table-body");
+    tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center italic text-slate-400">Memuat nilai...</td></tr>';
+    
+    document.getElementById("viewStudentModal").classList.remove("hidden");
+
+    google.script.run.withSuccessHandler(grades => {
+        // Backend now returns only the grades object: { 1: [...], 2: [...] }
+        tbody.innerHTML = "";
+        
+        // Loop 5 semesters
+        for(let s=1; s<=5; s++){
+            const n = grades && grades[s] ? grades[s] : ["-", "-", "-", "-", "-"];
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="p-2 border font-semibold text-slate-500">SMT ${s}</td>
+                <td class="p-2 border">${n[0] || 0}</td>
+                <td class="p-2 border">${n[1] || 0}</td>
+                <td class="p-2 border">${n[2] || 0}</td>
+                <td class="p-2 border">${n[3] || 0}</td>
+                <td class="p-2 border">${n[4] || 0}</td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+    }).withFailureHandler(err => {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-400">Gagal memuat nilai</td></tr>';
+        showAlert("Gagal memuat nilai siswa", "error");
+    }).getStudentByNIS(token, nis);
+}
+
+function closeViewStudentModal() {
+    document.getElementById("viewStudentModal").classList.add("hidden");
+}
+
+// Admin Users logic
+const registeredList = document.getElementById("registered-user-list")
+const requestList = document.getElementById("request-user-list")
+const noRegisteredList = document.getElementById("no-registered-user")
+const noRequestList = document.getElementById("no-user-request")
+const registeredNode = document.getElementById("registered-user-node-template").content.firstElementChild
+const requestNode = document.getElementById("request-user-node-template").content.firstElementChild
+const skeletonAdmin = document.getElementById("skeleton-row-admin").content;
+
+function setAdminSection(){
+  showAdminSkeletons();
+
+  google.script.run.withSuccessHandler(res => {
+    const {users, requests} = res
+    
+    cleanList(registeredList);
+    cleanList(requestList);
+    
+    if(users.length > 0){
+      noRegisteredList.classList.add("hidden")
+      const fragment = document.createDocumentFragment()
+
+      for(let i=0;i<users.length;i++){
+        const newEl = registeredNode.cloneNode(true)
+        newEl.dataset.username = users[i][0]
+        newEl.querySelector('.no-col').innerText = i + 1;
+        newEl.querySelector('.username-col').innerText = users[i][0]
+        
+        // Show role badge
+        const role = users[i][1] || 'guru';
+        const roleBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">${role}</span>`;
+        newEl.querySelector('.role-col').innerHTML = roleBadge;
+
+        fragment.appendChild(newEl)
+      }
+      registeredList.appendChild(fragment)
+    } else {
+        noRegisteredList.classList.remove("hidden")
+    }
+
+    if(requests.length > 0){
+      noRequestList.classList.add("hidden")
+      const fragment = document.createDocumentFragment()
+
+      for(let i=0;i<requests.length;i++){
+        const newEl = requestNode.cloneNode(true)
+        newEl.dataset.username = requests[i][0] 
+        newEl.querySelector('.no-col').innerText = i + 1;
+        newEl.querySelector('.username-col').innerText = requests[i][0]
+        
+        // Show Requested Role (with badge)
+        const reqRole = requests[i][1] || 'guru';
+        const roleBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${reqRole === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">${reqRole}</span>`;
+        newEl.querySelector('.req-role-col').innerHTML = roleBadge;
+        
+        fragment.appendChild(newEl)
+      }
+      requestList.appendChild(fragment)
+    } else {
+        noRequestList.classList.remove("hidden")
+    }
+  }).withFailureHandler(err => {
+    showAlert("server error", "error")
+    cleanList(registeredList);
+    cleanList(requestList);
+  }).getUserList()
+}
+
+function showAdminSkeletons(){
+    cleanList(registeredList);
+    cleanList(requestList);
+    noRegisteredList.classList.add("hidden");
+    noRequestList.classList.add("hidden");
+
+    for(let i=0; i<3; i++){
+        registeredList.appendChild(skeletonAdmin.cloneNode(true));
+        requestList.appendChild(skeletonAdmin.cloneNode(true));
+    }
+}
+
+function cleanList(listElement){
+    while(listElement.children.length > 1) { 
+        listElement.removeChild(listElement.lastChild);
+    }
+}
+
+function requestUserHandler(el, isApproved){
+  const root = el.closest("#request-user-node")
+  const username = root.dataset.username
+  const token = localStorage.getItem("token");
+  
+  google.script.run.withSuccessHandler(res => {
+    if(res.ok){
+      showAlert(res.message)
+      root.remove()
+      if(requestList.querySelectorAll('li').length <= 1){ 
+          noRequestList.classList.remove("hidden")
+      }
+
+      if(isApproved){
+        // Refresh registered list to see new user
+        setAdminSection(); 
+      }
+      return
+    }
+
+    showAlert(res.message, "error")
+  }).withFailureHandler(err => {
+    showAlert("server error", "error")
+  }).setRequestUser(token, username, isApproved)
+}
+
+// MODIFIKASI: Universal Delete/Reset Confirmation
+let deleteTargetEl = null;
+let deleteType = ""; // 'user', 'student_reset', 'student_delete'
+
+function confirmDeleteUser(el) {
+    deleteTargetEl = el;
+    deleteType = "user";
+    updateModalUI("Konfirmasi Hapus User", "Apakah Anda yakin ingin menghapus user ini? Akses mereka akan dicabut permanen.", "bg-red-600 hover:bg-red-700", "fa-triangle-exclamation text-red-600");
+    document.getElementById("confirmModal").classList.remove("hidden");
+}
+
+function confirmResetStudent(el) {
+    deleteTargetEl = el;
+    deleteType = "student_reset";
+    updateModalUI("Reset Nilai Siswa", "Apakah Anda yakin ingin mereset semua nilai siswa ini menjadi 0? Data siswa tetap aman.", "bg-orange-600 hover:bg-orange-700", "fa-eraser text-orange-600");
+    document.getElementById("confirmModal").classList.remove("hidden");
+}
+
+function confirmDeleteStudent(el) {
+    deleteTargetEl = el;
+    deleteType = "student_delete";
+    updateModalUI("Hapus Data Siswa", "PERINGATAN: Tindakan ini akan menghapus data siswa beserta seluruh riwayat nilainya secara permanen.", "bg-red-700 hover:bg-red-800", "fa-trash-can text-red-700");
+    document.getElementById("confirmModal").classList.remove("hidden");
+}
+
+function updateModalUI(title, desc, btnClass, iconClass) {
+    document.getElementById("confirm-title").innerText = title;
+    document.getElementById("confirm-desc").innerText = desc;
+    
+    const confirmBtn = document.getElementById("confirmBtn");
+    confirmBtn.className = `flex-1 px-4 py-2 text-white rounded-lg text-sm font-medium shadow-md transition-colors ${btnClass}`;
+    
+    const iconEl = document.getElementById("confirm-icon");
+    iconEl.className = `text-xl fa-solid ${iconClass}`;
+}
+
+function closeConfirm() {
+    deleteTargetEl = null;
+    deleteType = "";
+    document.getElementById("confirmModal").classList.add("hidden");
+}
+
+// Handle Yes Button Click
+document.getElementById("confirmBtn").addEventListener("click", () => {
+    if(deleteTargetEl) {
+        const token = localStorage.getItem("token");
+        
+        if (deleteType === "user") {
+            removeUser(deleteTargetEl);
+        } else if (deleteType === "student_reset") {
+            const row = deleteTargetEl.closest("tr");
+            const nis = row.dataset.nis;
+            
+            google.script.run.withSuccessHandler(res => {
+                if(res.success) {
+                    showAlert("Nilai siswa berhasil direset", "success");
+                } else {
+                    showAlert(res.message || "Gagal mereset nilai", "error");
+                }
+            }).withFailureHandler(err => {
+                showAlert("Gagal menghubungi server", "error");
+            }).resetStudentGrades(token, nis);
+        } else if (deleteType === "student_delete") {
+            const row = deleteTargetEl.closest("tr");
+            const nisn = row.dataset.nisn;
+            console.log(typeof nisn)
+            
+            google.script.run.withSuccessHandler(res => {
+                if(res.success) {
+                    showAlert("Data siswa berhasil dihapus permanen", "success");
+                    row.remove();
+                    const tbody = document.getElementById("student-list-body");
+                    if(tbody.children.length === 0) {
+                         tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-400">Tidak ada data siswa</td></tr>';
+                    }
+                } else {
+                    showAlert(res.message || "Gagal menghapus siswa", "error");
+                }
+            }).withFailureHandler(err => {
+                showAlert("Gagal menghubungi server", "error");
+            }).deleteStudent(token, nisn);
+        }
+        closeConfirm();
+    }
+});
+
+function removeUser(el){
+  const root = el.closest("#registered-user-node") 
+  const username = root.dataset.username || root.querySelector('h4:nth-child(2)').innerText;
+  const token = localStorage.getItem("token");
+
+  google.script.run.withSuccessHandler(res => {
+    if(res.ok){
+      showAlert(res.message)
+      root.remove()
+       if(registeredList.querySelectorAll('li').length <= 1){
+         noRegisteredList.classList.remove("hidden")
+       }
+      return
+    }
+
+    showAlert(res.message, "error")
+  }).withFailureHandler(err => {
+    showAlert("server error", "error")
+  }).removeUser(token, username)
+}
+
+// main logic
+searchForm.addEventListener("submit", e => {
+  e.preventDefault()
+  setSubmitDisabled(searchBtn, true, "Cari Siswa")
+
+  const nisn = document.getElementById("nisn").value;
+  const tgl = document.getElementById("tgl").value;
+  
+  // Validasi NISN input di search form
+  if(!/^\d{10}$/.test(nisn)) {
+      showAlert("NISN harus terdiri dari 10 digit angka.", "warning");
+      setSubmitDisabled(searchBtn, false, "Cari Siswa");
+      return;
+  }
+  
+  showSearchSkeleton();
+
+  google.script.run.withSuccessHandler(res=>{
+    setSubmitDisabled(searchBtn, false, "Cari Siswa")
+    if(!res){
+      showAlert("Data tidak ditemukan", "info")
+      backToSearch(); 
+      return
+    }
+    showAlert("Data ditemukan", "success")
+
+    currentNISN = res.siswa.nisn
+
+    document.getElementById("nama").innerText=res.siswa.nama;
+    document.getElementById("nisn2").innerText= currentNISN
+    document.getElementById("nis").innerText=res.siswa.nis;
+    document.getElementById("kelas").innerText=res.siswa.kelas;
+    document.getElementById("email").innerText=res.siswa.email;
+
+    const template = document.getElementById("row-template");
+    const tbody = document.getElementById("tbl");
+    tbody.innerHTML = "";
+
+    for(let s=1; s<=5; s++){
+      let n = res.nilai[s] || [0,0,0,0,0]; // Handle null/undefined values
+      const clone = template.content.cloneNode(true);
+      clone.querySelector(".semester").textContent = "SMT " + s;
+      const inputs = clone.querySelectorAll("input");
+      inputs[0].value = n[0];
+      inputs[1].value = n[1];
+      inputs[2].value = n[2];
+      inputs[3].value = n[3];
+      inputs[4].value = n[4];
+      tbody.appendChild(clone);
+    }
+    
+    document.getElementById("save-btn").disabled = false;
+    document.getElementById("save-btn").classList.remove("opacity-70");
+    document.getElementById("status").classList.remove("skeleton", "text-transparent");
+
+    addInputListeners()
+    initCalculate()
+
+  }).getDataSiswa(nisn,tgl);
+})
+
+function showSearchSkeleton() {
+    searchForm.classList.add("hidden");
+    dataSection.classList.remove("hidden");
+    
+    const fields = ["nama", "nisn2", "nis", "kelas", "email"];
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        el.innerHTML = '<div class="skeleton h-4 w-full rounded"></div>';
+    });
+    
+    const tbody = document.getElementById("tbl");
+    tbody.innerHTML = "";
+    const skelRow = document.getElementById("skeleton-row-table").content;
+    for(let i=0; i<5; i++){
+        tbody.appendChild(skelRow.cloneNode(true));
+    }
+    
+    const statusEl = document.getElementById("status");
+    statusEl.innerHTML = "";
+    statusEl.className = "skeleton h-10 w-full rounded-lg";
+}
+
+const saveBtn = document.getElementById("save-btn")
+function save(){
+  const token = localStorage.getItem("token")
+  if(!token){return showAlert("Login sebagai Guru/Admin untuk menyimpan", "error")}
+
+  setSubmitDisabled(saveBtn, true, "Simpan")
+  let inputs=document.querySelectorAll("#tbl tr input");
+  let data = [];
+  let isInvalid = false
+  let invalidValue = null
+  
+  inputs.forEach((input)=>{
+    const value = Number(input.value)
+    if(value < 0 || value > 100){
+      isInvalid = true
+      invalidValue = value
+      return
+    }
+    data.push(value)
+  });
+
+  if(isInvalid){
+    showAlert(`Nilai ${invalidValue} tidak valid (0-100)`, "warning")
+    setSubmitDisabled(saveBtn, false, "Simpan")
+    return
+  }
+
+  google.script.run.withSuccessHandler((res)=>{
+    if(!res){
+        setSubmitDisabled(saveBtn, false, "Simpan")
+        return showAlert("Gagal menyimpan data", "error")
+    }
+
+    showAlert("Data berhasil disimpan", "success")
+    setSubmitDisabled(saveBtn, false, "Simpan")
+  }).withFailureHandler(err => {
+    setSubmitDisabled(saveBtn, false, "Simpan")
+    showAlert("server error", "error")
+  }).saveData(token, currentNISN,[data]); // Adjust logic if backend expects flattened array or nested
+}
+
+function addInputListeners(){
+  document.querySelectorAll("#tbl tr").forEach(row=>{
+    row.querySelectorAll("input").forEach(input=>{
+      input.onchange = () => {
+        let inputs = row.querySelectorAll("input");
+        let sum = 0;
+        inputs.forEach(i=>sum += Number(i.value||0));
+        let avg = sum / inputs.length;
+        row.children[row.children.length - 1].innerText = avg.toFixed(2);
+        updateStatus();
+      }
+      input.addEventListener('focus', () => row.classList.add('bg-blue-50'));
+      input.addEventListener('blur', () => row.classList.remove('bg-blue-50'));
+    });
+  });
+}
+
+function initCalculate() {
+  document.querySelectorAll("#tbl tr").forEach(row => {
+    const inputs = row.querySelectorAll("input");
+    let sum = 0;
+    inputs.forEach(i => sum += Number(i.value || 0));
+    const avg = sum / inputs.length;
+    row.children[row.children.length - 1].innerText = avg.toFixed(2);
+  });
+  updateStatus();
+}
+
+function updateStatus(){
+  let rows = document.querySelectorAll("#tbl tr");
+  let total = 0, count = 0;
+  rows.forEach(r=>{
+    let avgText = r.children[r.children.length - 1].innerText;
+    let avg = parseFloat(avgText) || 0;
+    total += avg;
+    count++;
+  });
+  let akhir = total/count;
+  let status="TIDAK LULUS";
+  let colorClass = "text-red-600 bg-red-100 border-red-200";
+  
+  if(akhir>=92) {
+      status="LULUS (MEMUASKAN)";
+      colorClass = "text-emerald-700 bg-emerald-100 border-emerald-200";
+  }
+  else if(akhir>=78) {
+      status="LULUS";
+      colorClass = "text-blue-700 bg-blue-100 border-blue-200";
+  }
+  
+  const statusEl = document.getElementById("status");
+  statusEl.innerText = `Rata-rata Akhir: ${akhir.toFixed(2)} — ${status}`;
+  statusEl.className = `py-2 px-3 rounded-lg border text-center font-bold text-xs sm:text-sm transition-all shadow-sm ${colorClass}`;
+}
+
+function showAlert(msg, type = "success", timeout = 3000) {
+  const el = document.getElementById("alertBox");
+  const msgEl = document.getElementById("alertMsg");
+  const iconEl = document.getElementById("alertIcon");
+
+  el.className = "fixed top-6 left-1/2 -translate-x-1/2 z-[200] min-w-[300px] max-w-md rounded-xl px-6 py-4 shadow-2xl transition-all duration-300 flex items-center gap-3 border backdrop-blur-md translate-y-[-20px] opacity-0";
+
+  const configs = {
+    success: { class: "bg-emerald-500/90 text-white border-emerald-400", icon: "fa-circle-check" },
+    error:   { class: "bg-red-500/90 text-white border-red-400", icon: "fa-circle-exclamation" },
+    warning: { class: "bg-amber-500/90 text-white border-amber-400", icon: "fa-triangle-exclamation" },
+    info:    { class: "bg-blue-500/90 text-white border-blue-400", icon: "fa-circle-info" }
+  };
+
+  const config = configs[type] || configs.info;
+  
+  el.classList.add(...config.class.split(" "));
+  iconEl.className = `fa-solid ${config.icon} text-xl`;
+  msgEl.textContent = msg;
+
+  el.classList.remove("hidden");
+  void el.offsetWidth;
+  el.classList.remove("translate-y-[-20px]", "opacity-0");
+  el.classList.add("translate-y-0", "opacity-100");
+
+  clearTimeout(el._t);
+  el._t = setTimeout(() => {
+    el.classList.replace("translate-y-0", "translate-y-[-20px]");
+    el.classList.replace("opacity-100", "opacity-0");
+    setTimeout(() => el.classList.add("hidden"), 300);
+  }, timeout);
+}
+
+function setSubmitDisabled(el, isDisabled, originalText) {
+  el.disabled = isDisabled;
+
+  if (isDisabled) {
+    el.classList.add("opacity-70", "cursor-not-allowed");
+    el.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Loading...`;
+  } else {
+    el.classList.remove("opacity-70", "cursor-not-allowed");
+    if(originalText) el.innerHTML = originalText;
+    else el.innerHTML = el.value; 
+  }
+}
+
+function backToSearch(){
+  searchForm.classList.remove("hidden")
+  dataSection.classList.add("hidden");
+}
+</script>
+</body>
+</html>
