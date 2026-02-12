@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sevenfeleven - XII F-7</title>
+    
+    <!-- Core Stack -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome (Ikon Stabil) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'hand': ['"Patrick Hand"', 'cursive'],
+                        'body': ['"Quicksand"', 'sans-serif'],
+                    },
+                    colors: {
+                        paper: '#fffdf5',
+                        tape: '#e5e7eb',
+                        scrap: {
+                            pink: '#ff9ff3',
+                            blue: '#54a0ff',
+                            yellow: '#feca57',
+                            green: '#1dd1a1',
+                            dark: '#2d3436',
+                            red: '#ff6b6b'
+                        }
+                    },
+                    boxShadow: {
+                        'scrap': '5px 5px 0px 0px rgba(45, 52, 54, 0.2)',
+                        'scrap-hover': '2px 2px 0px 0px rgba(45, 52, 54, 0.2)',
+                    },
+                    animation: {
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'pop-in': 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'pop-in-up': 'popInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    },
+                    keyframes: {
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-2deg)' },
+                            '50%': { transform: 'rotate(2deg)' },
+                        },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        popInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px) scale(0.9)' },
+                            '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fffdf5;
+            background-image: radial-gradient(#dfe6e9 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .hero-mask {
+            mask-image: linear-gradient(to bottom, transparent 0%, black 40%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40%);
+        }
+        .slide-track {
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        /* Glassmorphism for overlays */
+        .glass-overlay {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="font-body text-scrap-dark antialiased overflow-x-hidden selection:bg-scrap-yellow selection:text-scrap-dark">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        // ==========================================
+        // DATA
+        // ==========================================
+        
+        const teacherData = {
+            name: "Bu Sri Wahyuni, S.Pd.",
+            role: "Wali Kelas XII F-7",
+            quote: "Kalian adalah anak-anak hebat. Jangan pernah takut bermimpi, karena masa depan ada di tangan kalian.",
+            img: "https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=1000&auto=format&fit=crop",
+            // Tambahkan kontak guru di sini (set null jika tidak ada)
+            ig: "https://instagram.com/sriwahyuni_teacher", 
+            tiktok: null 
+        };
+
+        const generateStudents = () => {
+            const baseStudents = [
+                { nickname: "Budi", fullname: "Budi Santoso", role: "Ketua Kelas", quote: "Santai tapi pasti bosku.", img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=600&q=60", ig: "budi.san", tiktok: "budigaming" },
+                { nickname: "Siti", fullname: "Siti Aminah", role: "Bendahara", quote: "Bayar uang kas woy!", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=60", ig: "siti_aminah", tiktok: null },
+                { nickname: "Rizky", fullname: "Rizky Pratama", role: "Gamer", quote: "Login login, gas push rank.", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=60", ig: "rizky.prtm", tiktok: "rizky_mlbb" },
+                { nickname: "Dewi", fullname: "Dewi Lestari", role: "K-Poper", quote: "Oppa adalah semangatku <3", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=60", ig: "dewi.l", tiktok: "kpop_dewi" },
+                { nickname: "Andi", fullname: "Andi Wijaya", role: "Tukang Tidur", quote: "Bangunin pas lulus ya.", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=60", ig: "andi.wj", tiktok: null },
+                { nickname: "Lina", fullname: "Lina Marlina", role: "Selebgram", quote: "Jangan lupa tap tap layarnya.", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=60", ig: "lina.marlina", tiktok: "lina_daily" }
+            ];
+            
+            let allStudents = [];
+            for (let i = 0; i < 6; i++) {
+                allStudents = [...allStudents, ...baseStudents.map((s, idx) => ({
+                    ...s,
+                    id: i * 6 + idx + 1,
+                    nickname: `${s.nickname}`, 
+                    fullname: `${s.fullname} ${i+1}`,
+                    ig: s.ig ? `https://instagram.com/${s.ig}` : null,
+                    tiktok: s.tiktok ? `https://tiktok.com/@${s.tiktok}` : null
+                }))];
+            }
+            return allStudents;
+        };
+
+        const students = generateStudents();
+
+        // ==========================================
+        // UI COMPONENTS
+        // ==========================================
+
+        const WashiTape = ({ colorClass = "bg-scrap-pink/50", rotate = "rotate-2" }) => (
+            <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 ${colorClass} ${rotate} backdrop-blur-[1px] shadow-sm z-20`}></div>
+        );
+
+        const Navbar = () => {
+            const [isOpen, setIsOpen] = useState(false);
+            return (
+                // Ubah left-4 ke right-4
+                <nav className="fixed top-4 right-4 z-40">
+                    <button onClick={() => setIsOpen(true)} className="bg-scrap-yellow border-2 border-scrap-dark w-12 h-12 rounded-lg shadow-scrap hover:translate-y-1 hover:shadow-none transition-all duration-200 flex items-center justify-center">
+                        <i className="fa-solid fa-bars text-xl text-scrap-dark"></i>
+                    </button>
+                    
+                    <div className={`fixed inset-0 bg-paper/95 backdrop-blur-md z-50 flex flex-col items-center justify-center space-y-8 transition-all duration-500 ease-out ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}`}>
+                        <button onClick={() => setIsOpen(false)} className="absolute top-6 right-6 text-2xl font-hand font-bold text-scrap-dark hover:text-scrap-pink hover:rotate-90 transition-all duration-300">
+                            <i className="fa-solid fa-xmark mr-2"></i> Tutup
+                        </button>
+                        <h2 className="text-5xl font-hand font-bold text-scrap-blue -rotate-2 drop-shadow-md">Sevenfeleven</h2>
+                        <div className="flex flex-col space-y-6 text-center text-3xl font-hand font-bold">
+                            <a href="#teacher" onClick={() => setIsOpen(false)} className="hover:text-scrap-yellow hover:scale-110 transition-transform">Guru Kami</a>
+                            <a href="#classmates" onClick={() => setIsOpen(false)} className="hover:text-scrap-green hover:scale-110 transition-transform -rotate-1">Teman Sekelas</a>
+                            <a href="#memories" onClick={() => setIsOpen(false)} className="hover:text-scrap-pink hover:scale-110 transition-transform rotate-1">Papan Kenangan</a>
+                        </div>
+                    </div>
+                </nav>
+            );
+        };
+
+        const Hero = () => (
+            <section className="relative w-full h-screen bg-sky-100 overflow-hidden flex flex-col justify-end">
+                <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-sky-200 to-transparent z-0"></div>
+                <div className="absolute top-[15%] left-0 right-0 text-center z-20 px-4">
+                    <h1 className="text-6xl md:text-9xl font-hand font-bold text-scrap-dark mb-2 drop-shadow-xl -rotate-2 animate-wiggle inline-block">
+                        Kita Selamanya
+                    </h1>
+                    <div className="flex justify-center mt-2">
+                        <span className="bg-white/80 backdrop-blur-sm px-6 py-2 rotate-1 shadow-lg transform text-lg md:text-2xl font-bold text-scrap-dark rounded-sm border border-gray-200">
+                            Lulus 2026, XII F-7 SMAN 4 Surakarta
+                        </span>
+                    </div>
+                </div>
+                <div className="relative w-full h-[70vh] z-10">
+                    <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-sky-100 to-transparent z-20"></div>
+                    <img 
+                        src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=2532&auto=format&fit=crop" 
+                        alt="Class Photo" 
+                        className="w-full h-full object-cover object-bottom"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-paper via-transparent to-transparent opacity-80 z-20"></div>
+                </div>
+            </section>
+        );
+
+        const TeacherSection = () => (
+            <section id="teacher" className="container mx-auto px-4 py-20">
+                 <div className="relative bg-white max-w-5xl mx-auto rounded-lg shadow-xl overflow-visible border-2 border-gray-100 p-8 transform rotate-1">
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-48 h-8 bg-scrap-yellow/50 -rotate-1 z-10 backdrop-blur-sm"></div>
+                    <div className="absolute -left-4 top-10 w-8 h-32 bg-scrap-blue/30 -rotate-3 rounded-l-md"></div>
+                    <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                        <div className="w-64 h-64 shrink-0 relative">
+                            <div className="absolute inset-0 border-4 border-gray-200 transform rotate-3 bg-white shadow-lg"></div>
+                            <img src={teacherData.img} alt={teacherData.name} className="relative w-full h-full object-cover border-4 border-white shadow-md transform -rotate-2" />
+                            <div className="absolute -bottom-6 -right-6 text-6xl opacity-20 rotate-12 text-scrap-dark">
+                                <i className="fa-solid fa-chalkboard-user"></i>
+                            </div>
+                        </div>
+                        <div className="flex-1 text-center md:text-left">
+                            <h2 className="text-3xl md:text-4xl font-hand font-bold text-scrap-dark mb-1">{teacherData.name}</h2>
+                            <p className="text-scrap-blue font-bold tracking-wide uppercase text-sm mb-6">{teacherData.role}</p>
+                            <div className="relative p-6 bg-paper rounded-lg border border-dashed border-gray-300 mb-6">
+                                <span className="absolute -top-4 left-4 text-6xl text-scrap-pink/20 font-serif">“</span>
+                                <p className="font-hand text-xl md:text-2xl text-scrap-dark italic leading-relaxed relative z-10">
+                                    {teacherData.quote}
+                                </p>
+                            </div>
+
+                            {/* Tombol Kontak Guru */}
+                            {(teacherData.ig || teacherData.tiktok) && (
+                                <div className="flex gap-3 justify-center md:justify-start">
+                                    {teacherData.ig && (
+                                        <a href={teacherData.ig} target="_blank" className="flex items-center gap-2 bg-white border-2 border-gray-200 px-4 py-2 rounded-lg text-scrap-dark hover:text-scrap-red hover:border-scrap-red hover:-translate-y-1 transition-all shadow-sm font-bold text-sm">
+                                            <i className="fa-brands fa-instagram text-lg"></i>
+                                            Instagram
+                                        </a>
+                                    )}
+                                    {teacherData.tiktok && (
+                                        <a href={teacherData.tiktok} target="_blank" className="flex items-center gap-2 bg-white border-2 border-gray-200 px-4 py-2 rounded-lg text-scrap-dark hover:text-scrap-blue hover:border-scrap-blue hover:-translate-y-1 transition-all shadow-sm font-bold text-sm">
+                                            <i className="fa-brands fa-tiktok text-lg"></i>
+                                            TikTok
+                                        </a>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+
+        const StudentModal = ({ student, onClose }) => {
+            const [showAnonForm, setShowAnonForm] = useState(false);
+            const [redirectData, setRedirectData] = useState(null); 
+
+            if (!student) return null;
+
+            const handleSocialClick = (type, url) => {
+                if (!url) return;
+                setRedirectData({ type, url });
+            };
+
+            const OverlayCard = ({ title, children, onClose: closeOverlay }) => (
+                <div className="absolute inset-0 z-50 glass-overlay flex items-center justify-center p-4 animate-fade-in">
+                    <div className="bg-white p-6 rounded-xl border-2 border-scrap-dark shadow-2xl max-w-sm w-full transform rotate-1 animate-pop-in-up relative">
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-scrap-blue/60 -rotate-1 backdrop-blur-[1px] shadow-sm z-20"></div>
+                        <h4 className="font-bold text-xl text-scrap-dark mb-4 text-center mt-2 border-b-2 border-scrap-yellow pb-2 inline-block w-full">{title}</h4>
+                        {children}
+                        <button onClick={closeOverlay} className="absolute top-2 right-2 text-gray-400 hover:text-red-500 font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                            <i className="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-pop-in">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
+                    
+                    <div className="relative bg-white w-full max-w-5xl max-h-[90vh] rounded-xl shadow-2xl overflow-hidden border-4 border-white transform rotate-1 flex flex-col md:flex-row">
+                        
+                        {/* STACKED LAYER 1: Redirect Warning */}
+                        {redirectData && (
+                            <OverlayCard title={`Buka ${redirectData.type === 'ig' ? 'Instagram' : 'TikTok'}?`} onClose={() => setRedirectData(null)}>
+                                <p className="text-sm text-gray-600 mb-6 font-hand text-lg text-center">
+                                    Kamu akan diarahkan ke profil {redirectData.type === 'ig' ? 'Instagram' : 'TikTok'} milik {student.nickname}.
+                                </p>
+                                <div className="flex gap-2">
+                                    <button onClick={() => setRedirectData(null)} className="flex-1 py-2 border-2 border-gray-200 rounded-lg font-bold text-gray-500 hover:bg-gray-50">Batal</button>
+                                    <button onClick={() => { window.open(redirectData.url, '_blank'); setRedirectData(null); }} className="flex-1 py-2 bg-scrap-blue text-white rounded-lg font-bold shadow-md hover:translate-y-1 hover:shadow-none transition-all">Lanjut ➜</button>
+                                </div>
+                            </OverlayCard>
+                        )}
+
+                        {/* STACKED LAYER 2: Anon Form */}
+                        {showAnonForm && (
+                            <OverlayCard title="Pesan Rahasia" onClose={() => setShowAnonForm(false)}>
+                                <AnonForm onClose={() => setShowAnonForm(false)} />
+                            </OverlayCard>
+                        )}
+
+                        {/* Base Content */}
+                        <div className="w-full md:w-1/2 h-[60vh] md:h-auto relative shrink-0 bg-gray-200 group">
+                            <img src={student.img} className="w-full h-full object-cover" alt={student.nickname} />
+                            
+                            <button onClick={onClose} className="absolute top-4 right-4 z-30 w-10 h-10 flex items-center justify-center bg-black/20 hover:bg-black/50 text-white rounded-full backdrop-blur-sm transition-all">
+                                <i className="fa-solid fa-xmark text-xl"></i>
+                            </button>
+
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 md:p-8">
+                                <span className="inline-block bg-scrap-yellow/90 text-scrap-dark px-3 py-1 rounded-sm text-xs md:text-sm font-bold tracking-widest uppercase transform -rotate-1 shadow-sm mb-2 w-max">
+                                    {student.role}
+                                </span>
+                                <h2 className="text-3xl md:text-5xl font-hand font-bold text-white leading-none drop-shadow-lg">
+                                    {student.fullname}
+                                </h2>
+                            </div>
+                        </div>
+
+                        <div className="w-full md:w-1/2 flex flex-col bg-paper relative h-[40vh] md:h-auto">
+                            <div className="flex-grow flex flex-col justify-center relative p-4 md:p-8 overflow-y-auto">
+                                <div className="flex flex-col justify-center h-full">
+                                    <div className="text-center md:text-left px-2">
+                                        <span className="text-4xl md:text-6xl font-hand text-scrap-blue/20 absolute -mt-4 ml-[-5px]">“</span>
+                                        <p className="font-hand text-2xl md:text-4xl text-scrap-dark/90 italic leading-snug relative z-10 pl-2">
+                                            {student.quote}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-3 md:p-4 border-t border-dashed border-gray-300 shrink-0 bg-paper">
+                                <div className="flex gap-2 items-stretch">
+                                    {student.ig && (
+                                        <button onClick={() => handleSocialClick('ig', student.ig)} className="bg-white border-2 border-gray-200 p-3 rounded-lg text-scrap-dark hover:text-scrap-red hover:border-scrap-red transition-colors flex items-center justify-center aspect-square">
+                                            <i className="fa-brands fa-instagram text-xl"></i>
+                                        </button>
+                                    )}
+                                    {student.tiktok && (
+                                        <button onClick={() => handleSocialClick('tiktok', student.tiktok)} className="bg-white border-2 border-gray-200 p-3 rounded-lg text-scrap-dark hover:text-scrap-blue hover:border-scrap-blue transition-colors flex items-center justify-center aspect-square">
+                                            <i className="fa-brands fa-tiktok text-xl"></i>
+                                        </button>
+                                    )}
+                                    
+                                    <button 
+                                        onClick={() => setShowAnonForm(true)}
+                                        className="flex-grow bg-scrap-dark text-white font-bold py-3 px-4 rounded-lg shadow-scrap hover:shadow-none hover:translate-y-1 transition-all flex items-center justify-center gap-2 group text-sm md:text-base"
+                                    >
+                                        <i className="fa-solid fa-envelope group-hover:animate-bounce"></i>
+                                        Kirim Pesan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const AnonForm = ({ onClose }) => {
+            const [sending, setSending] = useState(false);
+            const [sent, setSent] = useState(false);
+            const [limitReached, setLimitReached] = useState(false);
+
+            const handleSend = (e) => {
+                e.preventDefault();
+                setSending(true);
+                setTimeout(() => {
+                    setSending(false);
+                    setSent(true);
+                    setLimitReached(true);
+                    setTimeout(() => {
+                        onClose();
+                    }, 2000);
+                }, 1500);
+            };
+
+            return (
+                <form onSubmit={handleSend} className="space-y-3">
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Judul</label>
+                        <input type="text" required className="w-full bg-gray-50 border-2 border-gray-200 rounded-lg p-2 font-hand text-lg focus:border-scrap-blue focus:outline-none transition-colors" placeholder="Pengagum Rahasia" />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Pesan</label>
+                        <textarea required rows="3" className="w-full bg-gray-50 border-2 border-gray-200 rounded-lg p-2 font-hand text-lg focus:border-scrap-blue focus:outline-none transition-colors resize-none" placeholder="..."></textarea>
+                    </div>
+                    <div className="pt-2">
+                        <button 
+                            type="submit"
+                            disabled={sending || limitReached}
+                            className={`w-full font-bold py-3 px-4 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 text-white
+                                ${limitReached ? 'bg-gray-400 cursor-not-allowed' : 'bg-scrap-blue hover:shadow-md hover:-translate-y-1'}
+                            `}
+                        >
+                            {sending ? "Mengirim..." : sent ? "✓ Terkirim" : limitReached ? "Limit Tercapai" : "Kirim Pesan"}
+                        </button>
+                    </div>
+                </form>
+            );
+        };
+
+        const ClassmatesCarousel = () => {
+            const [selectedStudent, setSelectedStudent] = useState(null);
+            const [currentPage, setCurrentPage] = useState(0);
+            
+            const ITEMS_PER_PAGE = 6;
+            const totalPages = Math.ceil(students.length / ITEMS_PER_PAGE);
+
+            const nextPage = () => setCurrentPage((prev) => (prev + 1) % totalPages);
+            const prevPage = () => setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+
+            const pages = useMemo(() => {
+                const chunks = [];
+                for (let i = 0; i < students.length; i += ITEMS_PER_PAGE) {
+                    chunks.push(students.slice(i, i + ITEMS_PER_PAGE));
+                }
+                return chunks;
+            }, []);
+
+            return (
+                <section id="classmates" className="py-10 container mx-auto px-4 min-h-[80vh] flex flex-col">
+                    <div className="text-center mb-8 relative">
+                        <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-8xl font-hand text-gray-200 select-none z-0 whitespace-nowrap hidden md:block opacity-50">
+                            36 SISWA
+                        </span>
+                        <h2 className="text-4xl md:text-5xl font-hand font-bold text-scrap-dark relative z-10 inline-block bg-scrap-yellow/30 px-4 transform -rotate-2">
+                            Teman Sekelas
+                        </h2>
+                    </div>
+
+                    <div className="relative flex-grow flex items-center overflow-hidden">
+                        <button onClick={prevPage} className="hidden md:block absolute left-0 z-20 w-10 h-10 bg-white rounded-full shadow-md hover:bg-gray-100 -ml-4 lg:-ml-10 flex items-center justify-center text-scrap-dark">
+                            <i className="fa-solid fa-chevron-left text-xl"></i>
+                        </button>
+
+                        <div className="w-full overflow-hidden">
+                            <div className="flex slide-track" style={{ transform: `translateX(-${currentPage * 100}%)` }}>
+                                {pages.map((pageStudents, pageIdx) => (
+                                    <div key={pageIdx} className="w-full flex-shrink-0 grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 px-1">
+                                        {pageStudents.map((student, idx) => (
+                                            <div 
+                                                key={student.id} 
+                                                onClick={() => setSelectedStudent(student)}
+                                                className={`group relative bg-white p-2 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 ${idx % 2 === 0 ? 'rotate-1' : '-rotate-1'} hover:rotate-0`}
+                                            >
+                                                <WashiTape colorClass={['bg-scrap-red/60', 'bg-scrap-blue/60', 'bg-scrap-green/60', 'bg-scrap-yellow/60'][idx % 4]} rotate={idx % 2 === 0 ? 'rotate-2' : '-rotate-2'} />
+
+                                                <div className="aspect-[3/4] overflow-hidden bg-gray-100 border border-gray-100 relative mt-2">
+                                                    <img src={student.img} alt={student.nickname} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end justify-center pb-3">
+                                                        <span className="font-hand text-3xl font-bold text-white drop-shadow-md tracking-wide">
+                                                            {student.nickname}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <button onClick={nextPage} className="hidden md:block absolute right-0 z-20 w-10 h-10 bg-white rounded-full shadow-md hover:bg-gray-100 -mr-4 lg:-mr-10 flex items-center justify-center text-scrap-dark">
+                            <i className="fa-solid fa-chevron-right text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div className="flex justify-center mt-8 space-x-2">
+                        {Array.from({ length: totalPages }).map((_, idx) => (
+                            <button key={idx} onClick={() => setCurrentPage(idx)} className={`w-3 h-3 rounded-full transition-all duration-300 ${currentPage === idx ? 'bg-scrap-dark w-8' : 'bg-gray-300 hover:bg-gray-400'}`} />
+                        ))}
+                    </div>
+                    
+                    <div className="md:hidden flex justify-between mt-4 px-4 text-gray-400 text-sm font-bold">
+                        <button onClick={prevPage}>← Prev</button>
+                        <span>{currentPage + 1} / {totalPages}</span>
+                        <button onClick={nextPage}>Next →</button>
+                    </div>
+
+                    <StudentModal student={selectedStudent} onClose={() => setSelectedStudent(null)} />
+                </section>
+            );
+        };
+
+        const App = () => {
+            return (
+                <div className="min-h-screen relative pb-20">
+                    <Navbar />
+                    <Hero />
+                    <TeacherSection />
+                    <ClassmatesCarousel />
+                    
+                    <div id="memories" className="container mx-auto py-20 text-center opacity-40">
+                        <hr className="border-dashed border-2 border-gray-300 mb-8 w-1/2 mx-auto" />
+                        <h3 className="font-hand text-3xl text-gray-400">Papan Kenangan (Coming Soon)</h3>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
+
